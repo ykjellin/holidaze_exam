@@ -1,10 +1,10 @@
-@import "bootstrap/scss/bootstrap";
-
 // Custom variables
 $primary: #007bff;
 $secondary: #6c757d;
 $body-bg: #f8f9fa;
 $body-color: #212529;
+
+@import "bootstrap/scss/bootstrap";
 
 body {
   background-color: $body-bg;
