@@ -6,7 +6,11 @@
     "allowImportingTsExtensions": true,
     "module": "NodeNext",
     "target": "ESNext",
-    "moduleResolution": "nodenext"
+    "moduleResolution": "nodenext",
+    "baseUrl": "./src",
+    "paths": {
+      "*": ["node_modules/*", "src/*"]
+    }
   },
   "exclude": ["node_modules", "dist"]
 }
