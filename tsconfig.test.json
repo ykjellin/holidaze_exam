@@ -8,10 +8,11 @@
     "emitDeclarationOnly": false,
     "strict": true,
     "jsx": "react-jsx",
-    "module": "CommonJS",
-    "moduleResolution": "node",
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "allowImportingTsExtensions": true
   },
   "include": ["src/tests/**/*.test.tsx", "src/tests/**/*.test.ts"],
   "exclude": ["node_modules", "dist", "**/*.d.ts", "**/*.d.ts.map", "**/*.js"]
