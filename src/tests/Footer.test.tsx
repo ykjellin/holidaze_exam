@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
-import { Footer } from "../components/layout/Footer";
+import { Footer } from "../components/layout/Footer.tsx";
 
 test("renders footer text", () => {
   render(<Footer />);

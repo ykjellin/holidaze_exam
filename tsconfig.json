@@ -1,17 +1,12 @@
 {
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" },
-    { "path": "./tsconfig.test.json" }
-  ],
   "compilerOptions": {
     "noEmit": true,
-    "declaration": false,
-    "declarationMap": false,
+    "strict": true,
     "jsx": "react-jsx",
-    "module": "ESNext",
+    "allowImportingTsExtensions": true,
+    "module": "NodeNext",
     "target": "ESNext",
-    "moduleResolution": "Node",
-    "strict": true
-  }
+    "moduleResolution": "nodenext"
+  },
+  "exclude": ["node_modules", "dist"]
 }

@@ -1,28 +1,21 @@
 {
   "compilerOptions": {
-    "tsBuildInfoFile": "./tscache/tsconfig-app.tsbuildinfo",
+    "noEmit": true,
+    "declaration": false,
+    "declarationMap": false,
+    "emitDeclarationOnly": false,
     "target": "es2020",
     "useDefineForClassFields": true,
     "lib": ["es2020", "dom", "dom.iterable"],
     "module": "esnext",
     "skipLibCheck": true,
     "moduleResolution": "node",
-    "allowImportingTsExtensions": true,
-
-    /* Fix TypeScript Import Issue */
-    "emitDeclarationOnly": true,
-
     "isolatedModules": true,
     "moduleDetection": "force",
     "jsx": "react-jsx",
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-
-    /* Composite Build Requirement */
-    "composite": true,
-    "declaration": true,
-    "declarationMap": true
+    "allowSyntheticDefaultImports": true
   },
   "include": ["src"],
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules", "dist", "**/*.d.ts", "**/*.d.ts.map", "**/*.js"]
 }
