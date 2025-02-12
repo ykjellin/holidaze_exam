@@ -1,0 +1,22 @@
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./tscache/tsconfig-test.tsbuildinfo",
+    "types": ["jest", "@testing-library/jest-dom"],
+    "strict": true,
+    "jsx": "react-jsx",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+
+    /* Composite Build Requirement */
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": false,
+    "noEmit": false
+  },
+  "include": ["src/tests/**/*.test.tsx", "src/tests/**/*.test.ts"],
+  "exclude": ["node_modules", "dist"]
+}
