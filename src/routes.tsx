@@ -1,18 +1,18 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { Layout } from "./components/layout/Layout";
-import Home from "./pages/Home";
-import Venues from "./pages/Venues";
-import VenueDetails from "./pages/VenueDetails";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Profile from "./pages/Profile";
-import NotFound from "./pages/NotFound";
+import { Layout } from "./components/layout/Layout.tsx";
+import Home from "./pages/Home.tsx";
+import Venues from "./pages/Venues.tsx";
+import VenueDetails from "./pages/VenueDetails.tsx";
+import Login from "./pages/Login.tsx";
+import Register from "./pages/Register.tsx";
+import Profile from "./pages/Profile.tsx";
+import NotFound from "./pages/NotFound.tsx";
 
 // Admin
-import Dashboard from "./pages/admin/Dashboard";
-import CreateVenue from "./pages/admin/CreateVenue";
-import EditVenue from "./pages/admin/EditVenue";
-import ManageBookings from "./pages/admin/ManageBookings";
+import Dashboard from "./pages/admin/Dashboard.tsx";
+import CreateVenue from "./pages/admin/CreateVenue.tsx";
+import EditVenue from "./pages/admin/EditVenue.tsx";
+import ManageBookings from "./pages/admin/ManageBookings.tsx";
 
 const router = createBrowserRouter([
   {
