@@ -1,10 +1,39 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { useAuth } from "../hooks/useAuth";
+import { useNavigate, Link } from "react-router-dom";
 
 const Login = () => {
+  const { login } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    try {
+      await login(email, password);
+      navigate("/profile");
+    } catch (err) {
+      console.error("Login error:", err);
+      setError(
+        "Login failed: " +
+          (err instanceof Error ? err.message : "Unknown error")
+      );
+    }
+  };
+
   return (
     <div className="container mt-5">
       <h1 className="text-center">Login</h1>
-      <form className="mx-auto" style={{ maxWidth: "400px" }}>
+      <form
+        onSubmit={handleLogin}
+        className="mx-auto"
+        style={{ maxWidth: "400px" }}
+      >
+        {error && <p className="alert alert-danger text-center">{error}</p>}
         <div className="mb-3">
           <label htmlFor="email" className="form-label">
             Email
@@ -12,8 +41,8 @@ const Login = () => {
           <input
             type="email"
             className="form-control"
-            id="email"
-            placeholder="Enter your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
         </div>
@@ -24,8 +53,8 @@ const Login = () => {
           <input
             type="password"
             className="form-control"
-            id="password"
-            placeholder="Enter your password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             required
           />
         </div>
@@ -33,9 +62,13 @@ const Login = () => {
           Login
         </button>
       </form>
-      <p className="text-center mt-3">
-        Don't have an account? <Link to="/register">Sign up</Link>
-      </p>
+
+      <div className="text-center mt-3">
+        <p>Don't have an account?</p>
+        <Link to="/register" className="btn btn-secondary w-100">
+          Register
+        </Link>
+      </div>
     </div>
   );
 };
