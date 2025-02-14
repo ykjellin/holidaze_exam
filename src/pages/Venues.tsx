@@ -11,6 +11,8 @@ interface Venue {
 
 const Venues = () => {
   const [venues, setVenues] = useState<Venue[]>([]);
+  const [filteredVenues, setFilteredVenues] = useState<Venue[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -19,6 +21,7 @@ const Venues = () => {
       try {
         const response = await fetchData("/venues");
         setVenues(response.data || []);
+        setFilteredVenues(response.data || []);
       } catch (err) {
         console.error("❌ Failed to fetch venues:", err);
         setError("Could not load venues. Please try again later.");
@@ -29,6 +32,20 @@ const Venues = () => {
     loadVenues();
   }, []);
 
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value.toLowerCase();
+    setSearchQuery(query);
+
+    if (query === "") {
+      setFilteredVenues(venues);
+    } else {
+      const filtered = venues.filter((venue) =>
+        venue.name.toLowerCase().includes(query)
+      );
+      setFilteredVenues(filtered);
+    }
+  };
+
   return (
     <div className="container mt-5">
       <h1 className="text-center">Browse Venues</h1>
@@ -36,12 +53,22 @@ const Venues = () => {
         Discover amazing venues for your next holiday.
       </p>
 
+      <div className="mb-4">
+        <input
+          type="text"
+          className="form-control"
+          placeholder="Search for a venue..."
+          value={searchQuery}
+          onChange={handleSearch}
+        />
+      </div>
+
       {loading && <p>Loading venues...</p>}
       {error && <p className="alert alert-danger">{error}</p>}
 
-      {!loading && !error && venues.length > 0 && (
+      {!loading && !error && filteredVenues.length > 0 && (
         <div className="row">
-          {venues.map((venue) => (
+          {filteredVenues.map((venue) => (
             <div className="col-md-4 mb-4" key={venue.id}>
               <div className="card">
                 <img
@@ -64,6 +91,10 @@ const Venues = () => {
             </div>
           ))}
         </div>
+      )}
+
+      {!loading && !error && filteredVenues.length === 0 && (
+        <p className="text-center">No venues match your search.</p>
       )}
     </div>
   );
