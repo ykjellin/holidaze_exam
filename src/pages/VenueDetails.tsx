@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { fetchData } from "../api/api";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 interface Venue {
   id: string;
@@ -14,6 +16,7 @@ interface Venue {
   };
   price?: number;
   media: { url: string; alt: string }[];
+  bookings?: number;
 }
 
 const VenueDetails = () => {
@@ -21,6 +24,7 @@ const VenueDetails = () => {
   const [venue, setVenue] = useState<Venue | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   useEffect(() => {
     const loadVenueDetails = async () => {
@@ -54,19 +58,29 @@ const VenueDetails = () => {
             <p className="text-center lead">
               {venue.description || "No description available."}
             </p>
-
             <p>
               <strong>Location:</strong>{" "}
               {venue.location
                 ? `${venue.location.address}, ${venue.location.city}, ${venue.location.zip}, ${venue.location.country}`
                 : "Unknown"}
             </p>
-
             <p>
               <strong>Price:</strong> $
               {venue.price ? venue.price.toFixed(2) : "N/A"} per night
             </p>
-            <Link to="/venues" className="btn btn-secondary">
+
+            {/* Calendar */}
+            <div className="mt-4">
+              <h5>Select an Available Date:</h5>
+              <DatePicker
+                selected={selectedDate}
+                onChange={(date) => setSelectedDate(date)}
+                placeholderText="Select a date"
+                className="form-control"
+              />
+            </div>
+
+            <Link to="/venues" className="btn btn-secondary mt-3">
               Back to Venues
             </Link>
           </div>
