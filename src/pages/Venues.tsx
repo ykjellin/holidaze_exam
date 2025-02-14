@@ -7,6 +7,7 @@ interface Venue {
   name: string;
   description?: string;
   media: { url: string; alt: string }[];
+  created: string;
 }
 
 const Venues = () => {
@@ -20,8 +21,14 @@ const Venues = () => {
     const loadVenues = async () => {
       try {
         const response = await fetchData("/venues");
-        setVenues(response.data || []);
-        setFilteredVenues(response.data || []);
+
+        const sortedVenues = response.data.sort(
+          (a: Venue, b: Venue) =>
+            new Date(b.created).getTime() - new Date(a.created).getTime()
+        );
+
+        setVenues(sortedVenues);
+        setFilteredVenues(sortedVenues);
       } catch (err) {
         console.error("❌ Failed to fetch venues:", err);
         setError("Could not load venues. Please try again later.");
