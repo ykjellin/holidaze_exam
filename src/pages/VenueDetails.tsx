@@ -71,11 +71,22 @@ const VenueDetails = () => {
 
   const isDateDisabled = (date: Date) => {
     return bookings.some((booking) => {
-      const startDate = new Date(booking.dateFrom);
-      const endDate = new Date(booking.dateTo);
+      let startDate = new Date(booking.dateFrom);
+      let endDate = new Date(booking.dateTo);
+
       return date >= startDate && date <= endDate;
     });
   };
+
+  useEffect(() => {
+    let today = new Date();
+
+    while (isDateDisabled(today)) {
+      today.setDate(today.getDate() + 1);
+    }
+
+    setSelectedDate(today);
+  }, [bookings]);
 
   return (
     <div className="container mt-5">
@@ -101,11 +112,11 @@ const VenueDetails = () => {
                 : "Unknown"}
             </p>
             <p>
-              <strong>Price:</strong> $
+              <strong>Price:</strong> ${" "}
               {venue.price ? venue.price.toFixed(2) : "N/A"} per night
             </p>
 
-            {/* Calendar */}
+            {/*  Calendar */}
             {token && apiKey ? (
               <div className="mt-4">
                 <h5>Select an Available Date:</h5>
