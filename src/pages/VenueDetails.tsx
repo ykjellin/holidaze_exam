@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { fetchData } from "../api/api";
+import { useAuth } from "../hooks/useAuth";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -16,12 +17,19 @@ interface Venue {
   };
   price?: number;
   media: { url: string; alt: string }[];
-  bookings?: number;
+}
+
+interface Booking {
+  id: string;
+  dateFrom: string;
+  dateTo: string;
 }
 
 const VenueDetails = () => {
   const { id } = useParams();
+  const { token, apiKey } = useAuth();
   const [venue, setVenue] = useState<Venue | null>(null);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -34,12 +42,40 @@ const VenueDetails = () => {
       } catch (err) {
         console.error("❌ Failed to fetch venue details:", err);
         setError("Could not load venue details. Please try again later.");
-      } finally {
-        setLoading(false);
       }
     };
+
+    const loadBookings = async () => {
+      if (!token || !apiKey) return;
+
+      try {
+        const response = await fetchData(`/bookings?venueId=${id}`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "X-Noroff-API-Key": apiKey,
+          },
+        });
+        setBookings(response.data || []);
+      } catch (err) {
+        console.error("❌ Failed to fetch bookings:", err);
+      }
+    };
+
     loadVenueDetails();
-  }, [id]);
+    if (token && apiKey) {
+      loadBookings();
+    }
+    setLoading(false);
+  }, [id, token, apiKey]);
+
+  const isDateDisabled = (date: Date) => {
+    return bookings.some((booking) => {
+      const startDate = new Date(booking.dateFrom);
+      const endDate = new Date(booking.dateTo);
+      return date >= startDate && date <= endDate;
+    });
+  };
 
   return (
     <div className="container mt-5">
@@ -70,15 +106,23 @@ const VenueDetails = () => {
             </p>
 
             {/* Calendar */}
-            <div className="mt-4">
-              <h5>Select an Available Date:</h5>
-              <DatePicker
-                selected={selectedDate}
-                onChange={(date) => setSelectedDate(date)}
-                placeholderText="Select a date"
-                className="form-control"
-              />
-            </div>
+            {token && apiKey ? (
+              <div className="mt-4">
+                <h5>Select an Available Date:</h5>
+                <DatePicker
+                  selected={selectedDate}
+                  onChange={(date) => setSelectedDate(date)}
+                  placeholderText="Select a date"
+                  className="form-control"
+                  filterDate={(date) => !isDateDisabled(date)}
+                />
+              </div>
+            ) : (
+              <p className="alert alert-warning text-center mt-3">
+                You must <Link to="/login">log in</Link> to view available
+                dates.
+              </p>
+            )}
 
             <Link to="/venues" className="btn btn-secondary mt-3">
               Back to Venues
