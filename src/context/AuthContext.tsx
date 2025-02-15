@@ -35,10 +35,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     try {
       const userData = await loginUser(email, password);
-      console.log(
-        "✅ Login Successful, Access Token received:",
-        userData.accessToken
-      );
 
       setToken(userData.accessToken);
       setUser(userData.name);
