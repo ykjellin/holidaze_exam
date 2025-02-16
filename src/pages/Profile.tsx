@@ -25,7 +25,7 @@ interface Booking {
 }
 
 const Profile = () => {
-  const { token, apiKey, user } = useAuth();
+  const { user, token, apiKey } = useAuth();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -34,14 +34,19 @@ const Profile = () => {
   const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
-    if (!token || !apiKey || !user?.name) {
+    if (!token || !apiKey || !user) {
       console.warn("⚠️ Missing authentication. Redirecting to login...");
       navigate("/login");
       return;
     }
+  }, [token, apiKey, user, navigate]);
+
+  useEffect(() => {
+    if (!user || !user.name) return;
 
     const loadProfile = async () => {
       try {
+        console.log("🔹 Fetching Profile for:", user.name);
         const response = await fetchData(`/profiles/${user.name}`, {
           method: "GET",
           headers: {
@@ -61,13 +66,14 @@ const Profile = () => {
     };
 
     loadProfile();
-  }, [user, token, apiKey, navigate]);
+  }, [user]);
 
   useEffect(() => {
     if (!profile?.name) return;
 
     const loadBookings = async () => {
       try {
+        console.log("🔹 Fetching Bookings for:", profile.name);
         const response = await fetchData(
           `/profiles/${profile.name}/bookings?_venue=true`,
           {
@@ -79,6 +85,7 @@ const Profile = () => {
           }
         );
 
+        console.log("✅ Bookings Loaded:", response.data);
         setBookings(response.data || []);
       } catch (err) {
         console.error("❌ Failed to fetch bookings:", err);
@@ -86,7 +93,7 @@ const Profile = () => {
     };
 
     loadBookings();
-  }, [profile, token, apiKey]);
+  }, [profile]);
 
   const handleRegisterAsVenueManager = async () => {
     if (!profile || !user?.name || !token || !apiKey) {
@@ -98,7 +105,9 @@ const Profile = () => {
     try {
       console.log("🔹 Registering as Venue Manager for:", user.name);
 
-      const updatedProfile = await updateProfile(token, apiKey, user.name);
+      const updatedProfile = await updateProfile(token, apiKey, user.name, {
+        venueManager: true,
+      });
 
       setProfile(updatedProfile);
       console.log("✅ Successfully registered as Venue Manager");
@@ -114,6 +123,15 @@ const Profile = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("apiKey");
     navigate("/login");
+  };
+
+  // 🔹 Debug Function to Reset Venue Manager Status
+  const debugResetVenueManager = () => {
+    if (!user) return;
+    const updatedUser = { ...user, venueManager: false };
+    setProfile({ ...profile, venueManager: false } as UserProfile);
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+    console.log("🔹 Debug: Reset venueManager to false");
   };
 
   return (
@@ -165,6 +183,13 @@ const Profile = () => {
           <p>You can create and manage venues on Holidaze.</p>
         </div>
       )}
+
+      {/* Debug Button for Testing */}
+      <div className="mt-3 text-center">
+        <button className="btn btn-warning" onClick={debugResetVenueManager}>
+          Debug: Reset Venue Manager
+        </button>
+      </div>
 
       {/* Upcoming Bookings */}
       <div className="mt-5">

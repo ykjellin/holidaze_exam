@@ -90,9 +90,10 @@ export async function fetchApiKey(accessToken: string) {
 export async function updateProfile(
   token: string,
   apiKey: string,
-  username: string
+  username: string,
+  updates: { avatarUrl?: string; bio?: string; venueManager?: boolean }
 ) {
-  console.log("🔹 Updating Profile for:", username);
+  console.log("🔹 Updating Profile with:", updates);
 
   try {
     const response = await fetchData(
@@ -104,17 +105,12 @@ export async function updateProfile(
           Authorization: `Bearer ${token}`,
           "X-Noroff-API-Key": apiKey,
         },
-        body: JSON.stringify({ venueManager: true }),
+        body: JSON.stringify(updates),
       },
       true
     );
 
     console.log("✅ Profile Updated Successfully:", response);
-
-    if (!response || !response.data) {
-      throw new Error("Profile update failed.");
-    }
-
     return response.data;
   } catch (error) {
     console.error("❌ Profile Update Error:", error);

@@ -6,6 +6,7 @@ import VenueDetails from "./pages/VenueDetails";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
+import EditProfile from "./pages/EditProfile";
 import NotFound from "./pages/NotFound";
 
 // Admin
@@ -25,6 +26,7 @@ const router = createBrowserRouter([
       { path: "login", element: <Login /> },
       { path: "register", element: <Register /> },
       { path: "profile", element: <Profile /> },
+      { path: "edit-profile", element: <EditProfile /> },
 
       // Admin
       { path: "admin/dashboard", element: <Dashboard /> },
