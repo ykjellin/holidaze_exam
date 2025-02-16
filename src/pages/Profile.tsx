@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { fetchData } from "../api/api";
 import { useAuth } from "../hooks/useAuth";
+import { updateProfile } from "../api/auth";
 
 interface UserProfile {
   name: string;
   email: string;
   bio?: string;
-  avatar?: { url: string; alt: string };
-  banner?: { url: string; alt: string };
+  avatar?: { url: string; alt?: string };
+  banner?: { url: string; alt?: string };
   venueManager: boolean;
 }
 
@@ -19,7 +20,7 @@ interface Booking {
   venue?: {
     id: string;
     name: string;
-    media?: { url: string; alt: string }[];
+    media?: { url: string; alt?: string }[];
   };
 }
 
@@ -29,22 +30,19 @@ const Profile = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
-    if (!token || !apiKey || !user) {
+    if (!token || !apiKey || !user?.name) {
       console.warn("⚠️ Missing authentication. Redirecting to login...");
       navigate("/login");
       return;
     }
-  }, [token, apiKey, user, navigate]);
-
-  useEffect(() => {
-    if (!user) return;
 
     const loadProfile = async () => {
       try {
-        console.log("🔹 Fetching Profile for:", user);
-        const response = await fetchData(`/profiles/${user}`, {
+        const response = await fetchData(`/profiles/${user.name}`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -57,18 +55,19 @@ const Profile = () => {
       } catch (err) {
         console.error("❌ Failed to fetch profile:", err);
         setError("Failed to load profile.");
+      } finally {
+        setLoading(false);
       }
     };
 
     loadProfile();
-  }, [user]);
+  }, [user, token, apiKey, navigate]);
 
   useEffect(() => {
     if (!profile?.name) return;
 
     const loadBookings = async () => {
       try {
-        console.log("🔹 Fetching Bookings for:", profile.name);
         const response = await fetchData(
           `/profiles/${profile.name}/bookings?_venue=true`,
           {
@@ -80,7 +79,6 @@ const Profile = () => {
           }
         );
 
-        console.log("✅ Bookings Loaded:", response.data);
         setBookings(response.data || []);
       } catch (err) {
         console.error("❌ Failed to fetch bookings:", err);
@@ -88,7 +86,29 @@ const Profile = () => {
     };
 
     loadBookings();
-  }, [profile]);
+  }, [profile, token, apiKey]);
+
+  const handleRegisterAsVenueManager = async () => {
+    if (!profile || !user?.name || !token || !apiKey) {
+      console.error("❌ Missing required credentials for updating profile.");
+      return;
+    }
+
+    setIsUpdating(true);
+    try {
+      console.log("🔹 Registering as Venue Manager for:", user.name);
+
+      const updatedProfile = await updateProfile(token, apiKey, user.name);
+
+      setProfile(updatedProfile);
+      console.log("✅ Successfully registered as Venue Manager");
+    } catch (err) {
+      console.error("❌ Failed to register as Venue Manager:", err);
+      setError("Failed to register as Venue Manager.");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -98,6 +118,7 @@ const Profile = () => {
 
   return (
     <div className="container mt-5">
+      {loading && <p>Loading profile...</p>}
       {error && <p className="alert alert-danger text-center">{error}</p>}
 
       {profile && (
@@ -128,7 +149,20 @@ const Profile = () => {
         <div className="mt-4 text-center">
           <h2>Become a Venue Manager</h2>
           <p>As a venue manager, you can create and manage your own venues.</p>
-          <button className="btn btn-success">Register as Venue Manager</button>
+          <button
+            className="btn btn-success"
+            onClick={handleRegisterAsVenueManager}
+            disabled={isUpdating}
+          >
+            {isUpdating ? "Registering..." : "Register as Venue Manager"}
+          </button>
+        </div>
+      )}
+
+      {profile?.venueManager && (
+        <div className="mt-4 text-center">
+          <h2>You are a Venue Manager</h2>
+          <p>You can create and manage venues on Holidaze.</p>
         </div>
       )}
 

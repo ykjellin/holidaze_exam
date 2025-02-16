@@ -86,3 +86,38 @@ export async function fetchApiKey(accessToken: string) {
     throw error;
   }
 }
+
+export async function updateProfile(
+  token: string,
+  apiKey: string,
+  username: string
+) {
+  console.log("🔹 Updating Profile for:", username);
+
+  try {
+    const response = await fetchData(
+      `/profiles/${username}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          "X-Noroff-API-Key": apiKey,
+        },
+        body: JSON.stringify({ venueManager: true }),
+      },
+      true
+    );
+
+    console.log("✅ Profile Updated Successfully:", response);
+
+    if (!response || !response.data) {
+      throw new Error("Profile update failed.");
+    }
+
+    return response.data;
+  } catch (error) {
+    console.error("❌ Profile Update Error:", error);
+    throw error;
+  }
+}
