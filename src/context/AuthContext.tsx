@@ -25,8 +25,14 @@ export const AuthContext = createContext<AuthContextType | undefined>(
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(() => {
-    const storedUser = getItem("user");
-    return storedUser ? JSON.parse(storedUser) : null;
+    try {
+      const storedUser = getItem("user");
+      return storedUser ? JSON.parse(storedUser) : null;
+    } catch (error) {
+      console.error("❌ Stored user data is not valid JSON, resetting user.");
+      removeItem("user"); // Remove corrupted data
+      return null;
+    }
   });
 
   const [token, setToken] = useState<string | null>(getItem("token"));
@@ -73,7 +79,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       console.log("✅ Full Profile Data:", profileResponse.data);
 
-      const formattedUser = {
+      const formattedUser: User = {
         name: profileResponse.data.name,
         email: profileResponse.data.email,
         bio: profileResponse.data.bio || "No bio provided",
@@ -89,7 +95,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setToken(userData.accessToken);
       setUser(formattedUser);
       setItem("token", userData.accessToken);
-      setItem("user", JSON.stringify(formattedUser));
+      setItem("user", JSON.stringify(formattedUser)); // ✅ Store as JSON string
     } catch (error) {
       console.error("❌ Login Error:", error);
       throw error;
