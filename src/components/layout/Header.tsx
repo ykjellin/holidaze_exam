@@ -41,7 +41,7 @@ const Header = () => {
           {token && user?.venueManager && (
             <Link
               className="nav-link mx-3 fw-bold text-success"
-              to="/dashboard"
+              to="admin/dashboard"
             >
               Dashboard
             </Link>
