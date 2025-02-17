@@ -1,43 +1,96 @@
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
 
-export const Header = () => {
+const Header = () => {
+  const { user, token, logout } = useAuth();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const toggleDropdown = () => {
+    setDropdownOpen((prev) => !prev);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
       <div className="container">
         <Link className="navbar-brand" to="/">
           Holidaze
         </Link>
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
-        <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav ms-auto">
-            <li className="nav-item">
-              <Link className="nav-link" to="/venues">
-                Venues
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/login">
-                Login
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link
-                className="nav-link btn btn-primary text-white"
-                to="/register"
+
+        <div className="d-flex align-items-center">
+          <Link className="nav-link mx-3" to="/venues">
+            Venues
+          </Link>
+
+          {token && user?.venueManager && (
+            <Link
+              className="nav-link mx-3 fw-bold text-success"
+              to="/dashboard"
+            >
+              Dashboard
+            </Link>
+          )}
+
+          {token && user ? (
+            <div className="dropdown position-relative" ref={dropdownRef}>
+              <button
+                className="btn btn-link dropdown-toggle"
+                type="button"
+                onClick={toggleDropdown}
+                aria-expanded={dropdownOpen}
+                data-bs-toggle="dropdown"
               >
-                Sign Up
-              </Link>
-            </li>
-          </ul>
+                <img
+                  src={user.avatar?.url || "https://placehold.co/40"}
+                  alt={user.avatar?.alt || "Profile"}
+                  className="rounded-circle"
+                  width={40}
+                  height={40}
+                />
+              </button>
+
+              <ul
+                className={`dropdown-menu dropdown-menu-end ${
+                  dropdownOpen ? "show" : ""
+                }`}
+              >
+                <li>
+                  <Link className="dropdown-item" to="/profile">
+                    Profile
+                  </Link>
+                </li>
+                <li>
+                  <button className="dropdown-item" onClick={() => logout()}>
+                    Logout
+                  </button>
+                </li>
+              </ul>
+            </div>
+          ) : (
+            <Link className="btn btn-primary ms-3" to="/login">
+              Login
+            </Link>
+          )}
         </div>
       </div>
     </nav>
   );
 };
+
+export default Header;

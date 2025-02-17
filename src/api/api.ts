@@ -5,7 +5,7 @@ export async function fetchData(
   endpoint: string,
   options: RequestInit = {},
   useHolidaze = true,
-  requiresAuth = true
+  requiresAuth = false
 ) {
   const token = localStorage.getItem("token");
   const apiKey = localStorage.getItem("apiKey");
@@ -24,7 +24,6 @@ export async function fetchData(
   }
 
   const url = `${BASE_URL}${useHolidaze ? HOLIDAZE_PATH : ""}${endpoint}`;
-  console.log("Fetching:", url, "Auth Required:", requiresAuth);
 
   try {
     const response = await fetch(url, { headers, ...options });
