@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { fetchData } from "../api/api";
+import { Link } from "react-router-dom";
 
 interface Venue {
   id: string;
@@ -32,7 +33,6 @@ const Home = () => {
 
   const fetchNextVenue = async () => {
     if (nextIndex >= venues.length) {
-      console.log("🔹 No more venues to fetch, resetting...");
       setNextIndex(0);
       return;
     }
@@ -62,40 +62,47 @@ const Home = () => {
         <div id="venueCarousel" className="carousel slide">
           <div className="carousel-inner">
             <div className="d-flex justify-content-center align-items-center">
-              <img
-                src={
-                  displayedVenues[0]?.media[0]?.url ||
-                  "https://placehold.co/300x200"
-                }
-                className="carousel-img prev mx-2"
-                alt={displayedVenues[0]?.media[0]?.alt || "Previous Venue"}
-                style={{ maxWidth: "300px", height: "auto", opacity: "0.6" }}
-              />
+              {displayedVenues.map((venue, index) => (
+                <Link
+                  to={`/venues/${venue.id}`}
+                  key={venue.id}
+                  className="position-relative mx-2"
+                >
+                  <img
+                    src={venue.media[0]?.url || "https://placehold.co/300x200"}
+                    className={`carousel-img ${
+                      index === 1 ? "active-img" : "inactive-img"
+                    }`}
+                    alt={venue.media[0]?.alt || venue.name}
+                    style={{
+                      maxWidth: index === 1 ? "600px" : "300px",
+                      height: "auto",
+                      border: index === 1 ? "3px solid white" : "none",
+                      boxShadow:
+                        index === 1 ? "0px 4px 10px rgba(0,0,0,0.2)" : "none",
+                      opacity: index === 1 ? "1" : "0.6",
+                      position: "relative",
+                    }}
+                  />
 
-              <img
-                src={
-                  displayedVenues[1]?.media[0]?.url ||
-                  "https://placehold.co/600x400"
-                }
-                className="carousel-img active-img mx-2"
-                alt={displayedVenues[1]?.media[0]?.alt || "Current Venue"}
-                style={{
-                  maxWidth: "600px",
-                  height: "auto",
-                  border: "3px solid white",
-                  boxShadow: "0px 4px 10px rgba(0,0,0,0.2)",
-                }}
-              />
-
-              <img
-                src={
-                  displayedVenues[2]?.media[0]?.url ||
-                  "https://placehold.co/300x200"
-                }
-                className="carousel-img next mx-2"
-                alt={displayedVenues[2]?.media[0]?.alt || "Next Venue"}
-                style={{ maxWidth: "300px", height: "auto", opacity: "0.6" }}
-              />
+                  <div
+                    className="position-absolute w-100 text-center"
+                    style={{
+                      bottom: "10px",
+                      left: "50%",
+                      transform: "translateX(-50%)",
+                      backgroundColor: "rgba(0, 0, 0, 0.5)",
+                      color: "white",
+                      padding: "5px 10px",
+                      borderRadius: "5px",
+                      maxWidth: index === 1 ? "500px" : "250px",
+                      fontSize: index === 1 ? "1.2rem" : "1rem",
+                    }}
+                  >
+                    {venue.name}
+                  </div>
+                </Link>
+              ))}
             </div>
           </div>
 
