@@ -8,12 +8,14 @@ interface Venue {
   description?: string;
   media?: { url: string; alt: string }[];
   created: string;
+  bookingsCount?: number; // 🔹 For sorting by bookings
 }
 
 const Venues = () => {
   const [venues, setVenues] = useState<Venue[]>([]);
   const [filteredVenues, setFilteredVenues] = useState<Venue[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortOption, setSortOption] = useState("newest"); // 🔹 Default sorting: Newest first
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
@@ -26,7 +28,9 @@ const Venues = () => {
       setIsFetching(true);
 
       try {
-        const response = await fetchData(`/venues?page=${page}&limit=100`);
+        const response = await fetchData(
+          `/venues?page=${page}&limit=100&_bookings=true`
+        );
 
         if (!response || !response.data) {
           setError("Could not load venues. Please try again later.");
@@ -64,6 +68,7 @@ const Venues = () => {
     }
   }, [venues]);
 
+  // 🔹 Handle Search Functionality
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
@@ -78,6 +83,20 @@ const Venues = () => {
     }
   };
 
+  // 🔹 Sorting Logic (No Least Booked Option)
+  const sortedVenues = [...filteredVenues].sort((a, b) => {
+    switch (sortOption) {
+      case "newest":
+        return new Date(b.created).getTime() - new Date(a.created).getTime();
+      case "oldest":
+        return new Date(a.created).getTime() - new Date(b.created).getTime();
+      case "mostBooked":
+        return (b.bookingsCount || 0) - (a.bookingsCount || 0);
+      default:
+        return 0;
+    }
+  });
+
   return (
     <div className="container mt-5">
       <h1 className="text-center">Browse Venues</h1>
@@ -85,22 +104,35 @@ const Venues = () => {
         Discover amazing venues for your next holiday.
       </p>
 
-      <div className="mb-4">
+      {/* 🔹 Search & Sorting */}
+      <div className="mb-4 d-flex justify-content-between">
         <input
           type="text"
           className="form-control"
           placeholder="Search for a venue..."
           value={searchQuery}
           onChange={handleSearch}
+          style={{ maxWidth: "300px" }}
         />
+
+        <select
+          className="form-select"
+          value={sortOption}
+          onChange={(e) => setSortOption(e.target.value)}
+          style={{ maxWidth: "200px" }}
+        >
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="mostBooked">Most Booked</option>
+        </select>
       </div>
 
       {loading && <p>Loading venues...</p>}
       {error && <p className="alert alert-danger">{error}</p>}
 
-      {!loading && !error && filteredVenues.length > 0 && (
+      {!loading && !error && sortedVenues.length > 0 && (
         <div className="row">
-          {filteredVenues.map((venue) => (
+          {sortedVenues.map((venue) => (
             <div className="col-md-4 mb-4" key={venue.id}>
               <div className="card">
                 <img
@@ -137,7 +169,7 @@ const Venues = () => {
         </div>
       )}
 
-      {!loading && !error && filteredVenues.length === 0 && (
+      {!loading && !error && sortedVenues.length === 0 && (
         <p className="text-center">No venues match your search.</p>
       )}
     </div>
