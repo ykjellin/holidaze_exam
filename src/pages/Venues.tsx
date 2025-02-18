@@ -8,14 +8,14 @@ interface Venue {
   description?: string;
   media?: { url: string; alt: string }[];
   created: string;
-  bookingsCount?: number; // 🔹 For sorting by bookings
+  bookingsCount?: number;
 }
 
 const Venues = () => {
   const [venues, setVenues] = useState<Venue[]>([]);
   const [filteredVenues, setFilteredVenues] = useState<Venue[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortOption, setSortOption] = useState("newest"); // 🔹 Default sorting: Newest first
+  const [sortOption, setSortOption] = useState("newest");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
@@ -68,7 +68,6 @@ const Venues = () => {
     }
   }, [venues]);
 
-  // 🔹 Handle Search Functionality
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
@@ -83,7 +82,6 @@ const Venues = () => {
     }
   };
 
-  // 🔹 Sorting Logic (No Least Booked Option)
   const sortedVenues = [...filteredVenues].sort((a, b) => {
     switch (sortOption) {
       case "newest":
@@ -104,7 +102,6 @@ const Venues = () => {
         Discover amazing venues for your next holiday.
       </p>
 
-      {/* 🔹 Search & Sorting */}
       <div className="mb-4 d-flex justify-content-between">
         <input
           type="text"
