@@ -6,7 +6,7 @@ interface Venue {
   id: string;
   name: string;
   description?: string;
-  media: { url: string; alt: string }[];
+  media?: { url: string; alt: string }[];
   created: string;
 }
 
@@ -16,28 +16,53 @@ const Venues = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [isLastPage, setIsLastPage] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
 
   useEffect(() => {
     const loadVenues = async () => {
+      if (isFetching || isLastPage) return;
+      setIsFetching(true);
+
       try {
-        const response = await fetchData("/venues");
+        const response = await fetchData(`/venues?page=${page}&limit=100`);
 
-        const sortedVenues = response.data.sort(
-          (a: Venue, b: Venue) =>
-            new Date(b.created).getTime() - new Date(a.created).getTime()
-        );
+        if (!response || !response.data) {
+          setError("Could not load venues. Please try again later.");
+          return;
+        }
 
-        setVenues(sortedVenues);
-        setFilteredVenues(sortedVenues);
+        setVenues((prevVenues) => {
+          const mergedVenues = [
+            ...prevVenues,
+            ...response.data.filter(
+              (venue: Venue) => !prevVenues.some((v) => v.id === venue.id)
+            ),
+          ];
+          return mergedVenues;
+        });
+
+        setIsLastPage(response.meta?.isLastPage ?? true);
+        if (!response.meta?.isLastPage) {
+          setPage((prevPage) => prevPage + 1);
+        }
       } catch (err) {
-        console.error("❌ Failed to fetch venues:", err);
         setError("Could not load venues. Please try again later.");
       } finally {
+        setIsFetching(false);
         setLoading(false);
       }
     };
+
     loadVenues();
-  }, []);
+  }, [page]);
+
+  useEffect(() => {
+    if (!searchQuery) {
+      setFilteredVenues(venues);
+    }
+  }, [venues]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value.toLowerCase();
@@ -79,9 +104,21 @@ const Venues = () => {
             <div className="col-md-4 mb-4" key={venue.id}>
               <div className="card">
                 <img
-                  src={venue.media[0]?.url || "https://placehold.co/300x200"}
+                  src={
+                    venue.media?.length &&
+                    venue.media[0]?.url?.startsWith("http")
+                      ? venue.media[0].url
+                      : "https://placehold.co/300x200"
+                  }
                   className="card-img-top"
-                  alt={venue.media[0]?.alt || venue.name}
+                  alt={venue.media?.[0]?.alt || venue.name}
+                  onError={(e) => {
+                    if (
+                      e.currentTarget.src !== "https://placehold.co/300x200"
+                    ) {
+                      e.currentTarget.src = "https://placehold.co/300x200";
+                    }
+                  }}
                 />
                 <div className="card-body">
                   <h5 className="card-title">{venue.name}</h5>
