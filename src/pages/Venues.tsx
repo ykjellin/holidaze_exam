@@ -6,38 +6,67 @@ interface Venue {
   id: string;
   name: string;
   description?: string;
-  media: { url: string; alt: string }[];
+  media?: { url: string; alt: string }[];
   created: string;
+  bookingsCount?: number;
 }
 
 const Venues = () => {
   const [venues, setVenues] = useState<Venue[]>([]);
   const [filteredVenues, setFilteredVenues] = useState<Venue[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortOption, setSortOption] = useState("newest");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [isLastPage, setIsLastPage] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
 
   useEffect(() => {
     const loadVenues = async () => {
-      try {
-        const response = await fetchData("/venues");
+      if (isFetching || isLastPage) return;
+      setIsFetching(true);
 
-        const sortedVenues = response.data.sort(
-          (a: Venue, b: Venue) =>
-            new Date(b.created).getTime() - new Date(a.created).getTime()
+      try {
+        const response = await fetchData(
+          `/venues?page=${page}&limit=100&_bookings=true`
         );
 
-        setVenues(sortedVenues);
-        setFilteredVenues(sortedVenues);
+        if (!response || !response.data) {
+          setError("Could not load venues. Please try again later.");
+          return;
+        }
+
+        setVenues((prevVenues) => {
+          const mergedVenues = [
+            ...prevVenues,
+            ...response.data.filter(
+              (venue: Venue) => !prevVenues.some((v) => v.id === venue.id)
+            ),
+          ];
+          return mergedVenues;
+        });
+
+        setIsLastPage(response.meta?.isLastPage ?? true);
+        if (!response.meta?.isLastPage) {
+          setPage((prevPage) => prevPage + 1);
+        }
       } catch (err) {
-        console.error("❌ Failed to fetch venues:", err);
         setError("Could not load venues. Please try again later.");
       } finally {
+        setIsFetching(false);
         setLoading(false);
       }
     };
+
     loadVenues();
-  }, []);
+  }, [page]);
+
+  useEffect(() => {
+    if (!searchQuery) {
+      setFilteredVenues(venues);
+    }
+  }, [venues]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value.toLowerCase();
@@ -53,6 +82,19 @@ const Venues = () => {
     }
   };
 
+  const sortedVenues = [...filteredVenues].sort((a, b) => {
+    switch (sortOption) {
+      case "newest":
+        return new Date(b.created).getTime() - new Date(a.created).getTime();
+      case "oldest":
+        return new Date(a.created).getTime() - new Date(b.created).getTime();
+      case "mostBooked":
+        return (b.bookingsCount || 0) - (a.bookingsCount || 0);
+      default:
+        return 0;
+    }
+  });
+
   return (
     <div className="container mt-5">
       <h1 className="text-center">Browse Venues</h1>
@@ -60,28 +102,52 @@ const Venues = () => {
         Discover amazing venues for your next holiday.
       </p>
 
-      <div className="mb-4">
+      <div className="mb-4 d-flex justify-content-between">
         <input
           type="text"
           className="form-control"
           placeholder="Search for a venue..."
           value={searchQuery}
           onChange={handleSearch}
+          style={{ maxWidth: "300px" }}
         />
+
+        <select
+          className="form-select"
+          value={sortOption}
+          onChange={(e) => setSortOption(e.target.value)}
+          style={{ maxWidth: "200px" }}
+        >
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="mostBooked">Most Booked</option>
+        </select>
       </div>
 
       {loading && <p>Loading venues...</p>}
       {error && <p className="alert alert-danger">{error}</p>}
 
-      {!loading && !error && filteredVenues.length > 0 && (
+      {!loading && !error && sortedVenues.length > 0 && (
         <div className="row">
-          {filteredVenues.map((venue) => (
+          {sortedVenues.map((venue) => (
             <div className="col-md-4 mb-4" key={venue.id}>
               <div className="card">
                 <img
-                  src={venue.media[0]?.url || "https://placehold.co/300x200"}
+                  src={
+                    venue.media?.length &&
+                    venue.media[0]?.url?.startsWith("http")
+                      ? venue.media[0].url
+                      : "https://placehold.co/300x200"
+                  }
                   className="card-img-top"
-                  alt={venue.media[0]?.alt || venue.name}
+                  alt={venue.media?.[0]?.alt || venue.name}
+                  onError={(e) => {
+                    if (
+                      e.currentTarget.src !== "https://placehold.co/300x200"
+                    ) {
+                      e.currentTarget.src = "https://placehold.co/300x200";
+                    }
+                  }}
                 />
                 <div className="card-body">
                   <h5 className="card-title">{venue.name}</h5>
@@ -100,7 +166,7 @@ const Venues = () => {
         </div>
       )}
 
-      {!loading && !error && filteredVenues.length === 0 && (
+      {!loading && !error && sortedVenues.length === 0 && (
         <p className="text-center">No venues match your search.</p>
       )}
     </div>

@@ -46,7 +46,6 @@ const Dashboard = () => {
     <div className="container mt-5">
       <h1 className="text-center">Venue Management</h1>
 
-      {/* 🔹 Create Venue Button (Always Visible) */}
       <div className="text-center my-4">
         <Link to="/admin/create-venue" className="btn btn-success">
           + Create New Venue
@@ -55,15 +54,12 @@ const Dashboard = () => {
 
       {error && <p className="alert alert-danger text-center">{error}</p>}
 
-      {/* 🔹 Loading State */}
       {loading && <p className="text-center">Loading venues...</p>}
 
-      {/* 🔹 No Venues Found */}
       {!loading && venues.length === 0 && (
         <p className="text-center">You have no venues yet.</p>
       )}
 
-      {/* 🔹 Managed Venues List */}
       {!loading && venues.length > 0 && (
         <div className="list-group mx-auto mt-4" style={{ maxWidth: "600px" }}>
           {venues.map((venue) => (
