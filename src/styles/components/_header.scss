@@ -1,5 +1,8 @@
+@import "../base/variables";
+
 .navbar {
   padding: 0.5rem 1rem;
+  background-color: $primary !important;
 }
 
 .navbar-brand {
