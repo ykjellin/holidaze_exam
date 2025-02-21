@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { fetchData } from "../api/api";
 import { Link } from "react-router-dom";
+import "../styles/pages/_venues.scss";
 
 interface Venue {
   id: string;
@@ -102,21 +103,19 @@ const Venues = () => {
         Discover amazing venues for your next holiday.
       </p>
 
-      <div className="mb-4 d-flex flex-column flex-md-row align-items-start">
+      <div className="mb-4 d-flex flex-column flex-md-row align-items-start search-filter-container">
         <input
           type="text"
-          className="form-control"
+          className="form-control search-input"
           placeholder="Search for a venue..."
           value={searchQuery}
           onChange={handleSearch}
-          style={{ maxWidth: "300px" }}
         />
 
         <select
-          className="form-select"
+          className="form-select sort-dropdown"
           value={sortOption}
           onChange={(e) => setSortOption(e.target.value)}
-          style={{ maxWidth: "200px" }}
         >
           <option value="newest">Newest First</option>
           <option value="oldest">Oldest First</option>

@@ -66,7 +66,7 @@ const Header = () => {
             {token && user?.venueManager && (
               <li className="nav-item">
                 <Link
-                  className="nav-link my-2 text-success"
+                  className="nav-link my-2"
                   to="/admin/dashboard"
                   onClick={() => setMenuOpen(false)}
                 >
@@ -101,6 +101,7 @@ const Header = () => {
                     className={`dropdown-menu dropdown-menu-end ${
                       dropdownOpen ? "show" : ""
                     }`}
+                    data-bs-popper="static"
                   >
                     <li>
                       <Link

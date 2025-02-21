@@ -1,17 +1,28 @@
 @import "../base/variables";
 
 .navbar {
+  width: 100%;
   background-color: $primary !important;
   padding: 0.8rem 1rem;
   display: flex;
   align-items: center;
 }
 
+/* ✅ Ensure navbar container handles layout properly */
+.navbar .container-fluid {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+/* ✅ Keep navbar brand (logo) aligned left */
 .navbar-brand {
-  font-size: 2.8rem;
+  font-size: 2.8rem !important;
   font-weight: 700;
   letter-spacing: 1px;
   color: white !important;
+  margin-right: auto; /* Ensures logo stays on the left */
 }
 
 .navbar-toggler {
@@ -22,17 +33,20 @@
 }
 
 @media (min-width: 992px) {
+  /* ✅ Center nav links inside collapse */
   .navbar-collapse {
     display: flex !important;
-    justify-content: space-between;
+    justify-content: center !important; /* Centers navbar links */
     align-items: center;
-    width: 100%;
+    flex-grow: 1; /* Allows the menu to fill space */
   }
 
+  /* ✅ Ensure navbar links are properly spaced */
   .navbar-nav {
     display: flex !important;
     flex-direction: row !important;
     align-items: center;
+    justify-content: center;
     gap: 1.5rem;
   }
 
@@ -41,9 +55,9 @@
   }
 
   .nav-link {
-    font-size: 1.2rem;
+    font-size: 1.2rem !important;
     padding: 0.5rem 1rem;
-    color: white !important;
+    color: $body-bg !important;
     text-align: left;
     display: inline-block;
   }
@@ -53,6 +67,7 @@
   }
 
   .profile-dropdown {
+    background-color: $body-bg !important;
     margin-left: auto !important;
     display: flex;
     align-items: center;
@@ -112,6 +127,7 @@
   height: 40px;
 }
 
+/* ✅ Profile Section */
 .profile-section {
   width: 100%;
   text-align: center;
@@ -154,17 +170,18 @@
   text-decoration: underline;
 }
 
+/* ✅ Dropdown Styling */
 @media (min-width: 992px) {
   .dropdown-menu {
-    background-color: white;
+    background-color: $body-bg !important;
     border-radius: 5px;
     min-width: 150px;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
   }
 
   .dropdown-item {
-    color: black;
-    font-size: 1rem;
+    color: $body-color;
+    font-size: 1.3rem;
     padding: 8px 12px;
   }
 
