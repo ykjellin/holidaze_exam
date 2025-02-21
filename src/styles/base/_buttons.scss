@@ -1,0 +1,6 @@
+@import "variables";
+
+button {
+  @extend .btn;
+  @extend .btn-primary;
+}

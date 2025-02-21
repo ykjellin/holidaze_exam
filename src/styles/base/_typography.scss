@@ -1,0 +1,30 @@
+@import url("https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;700&family=Lora:wght@400;700&family=Montserrat:wght@400;700&display=swap");
+@import "variables";
+
+body {
+  font-family: "Lora", serif;
+  font-size: 16px;
+  color: $body-color;
+}
+
+h1,
+h2,
+h3 {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 700;
+}
+
+.holidaze-logo {
+  font-family: "Josefin Sans", sans-serif;
+  font-weight: 700;
+}
+
+.card {
+  font-family: "Lora", serif;
+  color: $body-color;
+}
+
+.card-title {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 700;
+}
