@@ -22,3 +22,15 @@ h1 {
   font-size: 3.2em;
   line-height: 1.1;
 }
+
+.container {
+  width: 100%;
+  padding: 1rem;
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 90%;
+    padding: 2rem;
+  }
+}

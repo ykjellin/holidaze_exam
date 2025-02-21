@@ -102,7 +102,7 @@ const Venues = () => {
         Discover amazing venues for your next holiday.
       </p>
 
-      <div className="mb-4 d-flex justify-content-between">
+      <div className="mb-4 d-flex flex-column flex-md-row align-items-start">
         <input
           type="text"
           className="form-control"
@@ -130,7 +130,7 @@ const Venues = () => {
       {!loading && !error && sortedVenues.length > 0 && (
         <div className="row">
           {sortedVenues.map((venue) => (
-            <div className="col-md-4 mb-4" key={venue.id}>
+            <div className="col-12 col-sm-6 col-md-4 mb-4" key={venue.id}>
               <div className="card">
                 <img
                   src={
