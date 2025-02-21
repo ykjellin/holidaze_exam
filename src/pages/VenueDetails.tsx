@@ -24,12 +24,21 @@ const VenueDetails = () => {
   const [guests, setGuests] = useState<number>(1);
   const [bookingSuccess, setBookingSuccess] = useState<string | null>(null);
   const [bookingError, setBookingError] = useState<string | null>(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
     const loadVenueDetails = async () => {
       try {
-        const response = await fetchData(`/venues/${id}`);
-        setVenue(response.data);
+        const response = await fetchData(`/venues/${id}?_media=true`);
+
+        const venueData = response.data;
+        if (!venueData.media || venueData.media.length === 0) {
+          venueData.media = [
+            { url: "https://placehold.co/600x400", alt: "Default Image" },
+          ];
+        }
+
+        setVenue(venueData);
       } catch (err) {
         console.error("❌ Failed to fetch venue details:", err);
       }
@@ -37,6 +46,20 @@ const VenueDetails = () => {
 
     loadVenueDetails();
   }, [id]);
+
+  const handleNextImage = () => {
+    if (venue && venue.media.length > 1) {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % venue.media.length);
+    }
+  };
+
+  const handlePrevImage = () => {
+    if (venue && venue.media.length > 1) {
+      setCurrentImageIndex((prevIndex) =>
+        prevIndex === 0 ? venue.media.length - 1 : prevIndex - 1
+      );
+    }
+  };
 
   const handleBooking = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,12 +105,35 @@ const VenueDetails = () => {
   return (
     <div className="container mt-5">
       {venue && (
-        <div className="card mx-auto" style={{ maxWidth: "600px" }}>
-          <img
-            src={venue.media[0]?.url || "https://placehold.co/600x400"}
-            className="card-img-top"
-            alt={venue.media[0]?.alt || venue.name}
-          />
+        <div className="card mx-auto venue-details-card">
+          <div className="image-carousel">
+            <img
+              src={
+                venue.media[currentImageIndex]?.url ||
+                "https://placehold.co/600x400"
+              }
+              className="carousel-image"
+              alt={venue.media[currentImageIndex]?.alt || venue.name}
+            />
+
+            {venue.media.length > 1 && (
+              <>
+                <button
+                  className="carousel-control prev"
+                  onClick={handlePrevImage}
+                >
+                  ❮
+                </button>
+                <button
+                  className="carousel-control next"
+                  onClick={handleNextImage}
+                >
+                  ❯
+                </button>
+              </>
+            )}
+          </div>
+
           <div className="card-body">
             <h1 className="text-center">{venue.name}</h1>
             <p className="text-center lead">
