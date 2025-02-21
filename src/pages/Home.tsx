@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { fetchData } from "../api/api";
 import { Link } from "react-router-dom";
+import "../styles/pages/_home.scss"; // ✅ Import the SCSS file
 
 interface Venue {
   id: string;
@@ -49,8 +50,8 @@ const Home = () => {
   };
 
   return (
-    <div className="container text-center mt-5">
-      <h1 className="display-4">Welcome to Holidaze</h1>
+    <div className="home-container">
+      <h1>Welcome to Holidaze</h1>
       <p className="lead">
         Find and book the perfect venue for your next holiday.
       </p>
@@ -61,49 +62,22 @@ const Home = () => {
       {!loading && !error && displayedVenues.length === 3 && (
         <div id="venueCarousel" className="carousel slide">
           <div className="carousel-inner">
-            <div className="d-flex justify-content-center align-items-center">
-              {displayedVenues.map((venue, index) => (
-                <Link
-                  to={`/venues/${venue.id}`}
-                  key={venue.id}
-                  className="position-relative mx-2"
-                >
-                  <img
-                    src={venue.media[0]?.url || "https://placehold.co/300x200"}
-                    className={`carousel-img ${
-                      index === 1 ? "active-img" : "inactive-img"
-                    }`}
-                    alt={venue.media[0]?.alt || venue.name}
-                    style={{
-                      maxWidth: index === 1 ? "600px" : "300px",
-                      height: "auto",
-                      border: index === 1 ? "3px solid white" : "none",
-                      boxShadow:
-                        index === 1 ? "0px 4px 10px rgba(0,0,0,0.2)" : "none",
-                      opacity: index === 1 ? "1" : "0.6",
-                      position: "relative",
-                    }}
-                  />
-
-                  <div
-                    className="position-absolute w-100 text-center"
-                    style={{
-                      bottom: "10px",
-                      left: "50%",
-                      transform: "translateX(-50%)",
-                      backgroundColor: "rgba(0, 0, 0, 0.5)",
-                      color: "white",
-                      padding: "5px 10px",
-                      borderRadius: "5px",
-                      maxWidth: index === 1 ? "500px" : "250px",
-                      fontSize: index === 1 ? "1.2rem" : "1rem",
-                    }}
-                  >
-                    {venue.name}
-                  </div>
-                </Link>
-              ))}
-            </div>
+            {displayedVenues.map((venue, index) => (
+              <Link
+                to={`/venues/${venue.id}`}
+                key={venue.id}
+                className="position-relative mx-2"
+              >
+                <img
+                  src={venue.media[0]?.url || "https://placehold.co/300x200"}
+                  className={`carousel-img ${
+                    index === 1 ? "active-img" : "inactive-img"
+                  }`}
+                  alt={venue.media[0]?.alt || venue.name}
+                />
+                <div className="venue-name-overlay">{venue.name}</div>
+              </Link>
+            ))}
           </div>
 
           <button
