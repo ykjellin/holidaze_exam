@@ -18,9 +18,8 @@ const VenueDetails = () => {
   const { id } = useParams();
   const { token, apiKey } = useAuth();
   const [venue, setVenue] = useState<Venue | null>(null);
-  const [selectedDates, setSelectedDates] = useState<
-    [Date | null, Date | null]
-  >([null, null]);
+  const [checkInDate, setCheckInDate] = useState<Date | null>(null);
+  const [checkOutDate, setCheckOutDate] = useState<Date | null>(null);
   const [guests, setGuests] = useState<number>(1);
   const [bookingSuccess, setBookingSuccess] = useState<string | null>(null);
   const [bookingError, setBookingError] = useState<string | null>(null);
@@ -66,10 +65,8 @@ const VenueDetails = () => {
     setBookingSuccess(null);
     setBookingError(null);
 
-    const [dateFrom, dateTo] = selectedDates;
-
-    if (!dateFrom || !dateTo) {
-      setBookingError("Please select check-in and check-out dates.");
+    if (!checkInDate || !checkOutDate) {
+      setBookingError("Please select both check-in and check-out dates.");
       return;
     }
 
@@ -87,8 +84,8 @@ const VenueDetails = () => {
           "X-Noroff-API-Key": apiKey,
         },
         body: JSON.stringify({
-          dateFrom: dateFrom.toISOString(),
-          dateTo: dateTo.toISOString(),
+          dateFrom: checkInDate.toISOString(),
+          dateTo: checkOutDate.toISOString(),
           guests,
           venueId: id,
         }),
@@ -151,21 +148,34 @@ const VenueDetails = () => {
               <form onSubmit={handleBooking} className="mt-4">
                 <h5>Book this Venue:</h5>
 
-                {/* Date Picker */}
-                <div className="mb-3">
-                  <label>Select Dates:</label>
-                  <DatePicker
-                    selected={selectedDates[0]}
-                    onChange={(dates) =>
-                      setSelectedDates(dates as [Date | null, Date | null])
-                    }
-                    startDate={selectedDates[0]}
-                    endDate={selectedDates[1]}
-                    selectsRange
-                    placeholderText="Select check-in and check-out dates"
-                    className="form-control"
-                    minDate={new Date()}
-                  />
+                <div className="row">
+                  <div className="col-md-6 mb-3">
+                    <label>Check-in Date:</label>
+                    <DatePicker
+                      selected={checkInDate}
+                      onChange={(date) => setCheckInDate(date)}
+                      selectsStart
+                      startDate={checkInDate}
+                      endDate={checkOutDate}
+                      placeholderText="Select check-in date"
+                      className="form-control"
+                      minDate={new Date()}
+                    />
+                  </div>
+
+                  <div className="col-md-6 mb-3">
+                    <label>Check-out Date:</label>
+                    <DatePicker
+                      selected={checkOutDate}
+                      onChange={(date) => setCheckOutDate(date)}
+                      selectsEnd
+                      startDate={checkInDate}
+                      endDate={checkOutDate}
+                      placeholderText="Select check-out date"
+                      className="form-control"
+                      minDate={checkInDate || new Date()}
+                    />
+                  </div>
                 </div>
 
                 {/* Guests */}
