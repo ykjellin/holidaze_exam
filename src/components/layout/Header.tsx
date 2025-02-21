@@ -6,7 +6,7 @@ const Header = () => {
   const { user, token, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLLIElement>(null);
 
   const toggleDropdown = () => {
     setDropdownOpen((prev) => !prev);
@@ -33,7 +33,7 @@ const Header = () => {
 
   return (
     <nav className="navbar navbar-expand-lg">
-      <div className="container">
+      <div className="container-fluid">
         <Link
           className="navbar-brand holidaze-logo"
           to="/"
@@ -52,7 +52,7 @@ const Header = () => {
         </button>
 
         <div className={`collapse navbar-collapse ${menuOpen ? "show" : ""}`}>
-          <ul className="navbar-nav flex-column align-items-center w-100">
+          <ul className="navbar-nav w-100 d-flex justify-content-center">
             <li className="nav-item">
               <Link
                 className="nav-link my-2"
@@ -66,7 +66,7 @@ const Header = () => {
             {token && user?.venueManager && (
               <li className="nav-item">
                 <Link
-                  className="nav-link my-2 fw-bold text-success"
+                  className="nav-link my-2 text-success"
                   to="/admin/dashboard"
                   onClick={() => setMenuOpen(false)}
                 >
@@ -74,67 +74,90 @@ const Header = () => {
                 </Link>
               </li>
             )}
+          </ul>
 
-            {token && user ? (
-              <li className="nav-item dropdown my-2">
-                <button
-                  className="btn btn-link dropdown-toggle"
-                  type="button"
-                  onClick={toggleDropdown}
-                  aria-expanded={dropdownOpen}
+          {token && user ? (
+            <>
+              <ul className="navbar-nav ms-auto">
+                <li
+                  className="nav-item dropdown d-none d-lg-block"
+                  ref={dropdownRef}
                 >
-                  <img
-                    src={user.avatar?.url || "https://placehold.co/40"}
-                    alt={user.avatar?.alt || "Profile"}
-                    className="rounded-circle"
-                    width={40}
-                    height={40}
-                  />
-                </button>
+                  <button
+                    className="btn btn-link dropdown-toggle"
+                    type="button"
+                    onClick={toggleDropdown}
+                    aria-expanded={dropdownOpen}
+                  >
+                    <img
+                      src={user.avatar?.url || "https://placehold.co/40"}
+                      alt={user.avatar?.alt || "Profile"}
+                      className="rounded-circle"
+                      width={40}
+                      height={40}
+                    />
+                  </button>
+                  <ul
+                    className={`dropdown-menu dropdown-menu-end ${
+                      dropdownOpen ? "show" : ""
+                    }`}
+                  >
+                    <li>
+                      <Link
+                        className="dropdown-item"
+                        to="/profile"
+                        onClick={() => setDropdownOpen(false)}
+                      >
+                        Profile
+                      </Link>
+                    </li>
+                    <li>
+                      <button
+                        className="dropdown-item"
+                        onClick={() => {
+                          setDropdownOpen(false);
+                          logout();
+                        }}
+                      >
+                        Logout
+                      </button>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
 
-                <ul
-                  className={`dropdown-menu dropdown-menu-end ${
-                    dropdownOpen ? "show" : ""
-                  }`}
-                >
-                  <li>
-                    <Link
-                      className="dropdown-item"
-                      to="/profile"
-                      onClick={() => {
-                        setDropdownOpen(false);
-                        setMenuOpen(false);
-                      }}
-                    >
-                      Profile
-                    </Link>
-                  </li>
-                  <li>
-                    <button
-                      className="dropdown-item"
-                      onClick={() => {
-                        setDropdownOpen(false);
-                        setMenuOpen(false);
-                        logout();
-                      }}
-                    >
-                      Logout
-                    </button>
-                  </li>
-                </ul>
-              </li>
-            ) : (
-              <li className="nav-item">
+              <li className="d-lg-none w-100 profile-section">
+                <hr className="profile-divider" />
+                <div className="text-center profile-text">Account</div>
                 <Link
-                  className="btn btn-primary my-2"
-                  to="/login"
+                  className="nav-link profile-link"
+                  to="/profile"
                   onClick={() => setMenuOpen(false)}
                 >
-                  Login
+                  Profile
                 </Link>
+                <button
+                  className="nav-link profile-link logout-btn"
+                  onClick={() => {
+                    logout();
+                    setMenuOpen(false);
+                  }}
+                >
+                  Logout
+                </button>
               </li>
-            )}
-          </ul>
+            </>
+          ) : (
+            <li className="nav-item">
+              <Link
+                className="btn btn-primary my-2"
+                to="/login"
+                onClick={() => setMenuOpen(false)}
+              >
+                Login
+              </Link>
+            </li>
+          )}
         </div>
       </div>
     </nav>
