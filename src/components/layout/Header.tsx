@@ -149,15 +149,13 @@ const Header = () => {
               </li>
             </>
           ) : (
-            <li className="nav-item">
-              <Link
-                className="btn btn-primary my-2"
-                to="/login"
-                onClick={() => setMenuOpen(false)}
-              >
-                Login
-              </Link>
-            </li>
+            <Link
+              className="btn login-btn my-2"
+              to="/login"
+              onClick={() => setMenuOpen(false)}
+            >
+              Login
+            </Link>
           )}
         </div>
       </div>
