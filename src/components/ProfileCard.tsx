@@ -14,13 +14,15 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile, onLogout }) => {
   return (
     <div className="card mx-auto" style={{ maxWidth: "500px" }}>
       <div className="card-body text-center">
-        <img
-          src={profile.avatar?.url || "https://placehold.co/150"}
-          alt={profile.avatar?.alt || "User Avatar"}
-          className="rounded-circle mb-3"
-          width={150}
-          height={150}
-        />
+        <div className="d-flex justify-content-center mb-3">
+          <img
+            src={profile.avatar?.url || "https://placehold.co/150"}
+            alt={profile.avatar?.alt || "User Avatar"}
+            className="rounded-circle"
+            width={150}
+            height={150}
+          />
+        </div>
         <h5 className="card-title">{profile.name}</h5>
         <p className="card-text">{profile.email}</p>
         <p className="card-text">{profile.bio || "No bio available."}</p>
