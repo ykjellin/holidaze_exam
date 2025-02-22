@@ -30,7 +30,7 @@ const Login = () => {
       <h1 className="text-center">Login</h1>
       <form
         onSubmit={handleLogin}
-        className="mx-auto"
+        className="mx-auto login-form"
         style={{ maxWidth: "400px" }}
       >
         {error && <p className="alert alert-danger text-center">{error}</p>}
@@ -58,14 +58,14 @@ const Login = () => {
             required
           />
         </div>
-        <button type="submit" className="btn btn-primary w-100">
+        <button type="submit" className="btn login-btn-submit w-100">
           Login
         </button>
       </form>
 
       <div className="text-center mt-3">
         <p>Don't have an account?</p>
-        <Link to="/register" className="btn btn-secondary w-100">
+        <Link to="/register" className="btn btn-secondary w-100 register-btn">
           Register
         </Link>
       </div>

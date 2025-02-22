@@ -100,7 +100,7 @@ const VenueDetails = () => {
   };
 
   return (
-    <div className="container mt-5">
+    <div className="container mt-5 venue-container">
       {venue && (
         <div className="card mx-auto venue-details-card">
           <div className="image-carousel">
