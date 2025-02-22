@@ -13,13 +13,10 @@ const ProfileVenueManager: React.FC<VenueManagerProps> = ({
   token,
   apiKey,
 }) => {
-  /* if (!profile.email.endsWith("@stud.noroff.no") || profile.venueManager) {
-    console.log(
-      "❌ Skipping Venue Manager Section: Already a manager or invalid email."
-    );
+  if (!profile.email.endsWith("@stud.noroff.no") || profile.venueManager) {
     return null;
   }
-*/
+
   const handleRegisterAsVenueManager = async () => {
     try {
       const response = await fetch(`/profiles/${profile.name}`, {
