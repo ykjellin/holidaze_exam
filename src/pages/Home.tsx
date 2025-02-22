@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { fetchData } from "../api/api";
 import { Link } from "react-router-dom";
-import "../styles/pages/_home.scss"; // ✅ Import the SCSS file
+import "../styles/pages/_home.scss";
 
 interface Venue {
   id: string;
@@ -39,7 +39,6 @@ const Home = () => {
     }
 
     try {
-      // Fetch the next venue
       const nextVenue = venues[nextIndex];
       setDisplayedVenues((prevVenues) => [...prevVenues.slice(1), nextVenue]);
       setNextIndex((prevIndex) => prevIndex + 1);
@@ -53,8 +52,12 @@ const Home = () => {
     <div className="home-container">
       <h1>Welcome to Holidaze</h1>
       <p className="lead">
-        Find and book the perfect venue for your next holiday.
+        Find and book the perfect venue for your next holiday or event.
       </p>
+
+      <Link to="/venues" className="btn my-3 action-btn">
+        Browse Venues
+      </Link>
 
       {loading && <p>Loading venues...</p>}
       {error && <p className="alert alert-danger">{error}</p>}
