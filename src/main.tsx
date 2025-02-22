@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./index.scss";
+import "./styles/index.scss";
 import AppRouter from "./routes";
 import ErrorBoundary from "./ErrorBoundary";
 import { AuthProvider } from "./context/AuthContext";

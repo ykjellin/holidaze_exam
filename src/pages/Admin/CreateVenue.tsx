@@ -24,20 +24,43 @@ const CreateVenue = () => {
     continent: "",
     lat: "",
     lng: "",
-    mediaUrl: "",
-    mediaAlt: "",
+    media: [{ url: "", alt: "" }],
   });
 
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    index?: number
   ) => {
     const { name, value, type } = e.target;
     const newValue =
       type === "checkbox" ? (e.target as HTMLInputElement).checked : value;
-    setFormData((prev) => ({ ...prev, [name]: newValue }));
+
+    if (index !== undefined) {
+      const updatedMedia = [...formData.media];
+      updatedMedia[index] = { ...updatedMedia[index], [name]: newValue };
+      setFormData((prev) => ({ ...prev, media: updatedMedia }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: newValue }));
+    }
+  };
+
+  const addMediaField = () => {
+    if (formData.media.length < 8) {
+      setFormData((prev) => ({
+        ...prev,
+        media: [...prev.media, { url: "", alt: "" }],
+      }));
+    }
+  };
+
+  const removeMediaField = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      media: prev.media.filter((_, i) => i !== index),
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -72,14 +95,7 @@ const CreateVenue = () => {
         lat: formData.lat ? Number(formData.lat) : 0,
         lng: formData.lng ? Number(formData.lng) : 0,
       },
-      media: formData.mediaUrl.trim()
-        ? [
-            {
-              url: formData.mediaUrl,
-              alt: formData.mediaAlt || "Venue Image",
-            },
-          ]
-        : [],
+      media: formData.media.filter((m) => m.url.trim()),
     };
 
     try {
@@ -105,15 +121,11 @@ const CreateVenue = () => {
   };
 
   return (
-    <div className="container mt-5">
+    <div className="container mt-5 venue-form-container">
       <h1 className="text-center">Create Venue</h1>
       {error && <p className="alert alert-danger text-center">{error}</p>}
 
-      <form
-        onSubmit={handleSubmit}
-        className="mx-auto"
-        style={{ maxWidth: "500px" }}
-      >
+      <form onSubmit={handleSubmit} className="mx-auto venue-form">
         <div className="mb-3">
           <label className="form-label">Venue Name</label>
           <input
@@ -205,28 +217,46 @@ const CreateVenue = () => {
         </div>
 
         <h4 className="mt-3">Media</h4>
-        <div className="mb-3">
-          <label className="form-label">Image URL</label>
-          <input
-            type="text"
-            className="form-control"
-            name="mediaUrl"
-            value={formData.mediaUrl}
-            onChange={handleChange}
-            placeholder="Enter image URL"
-          />
-        </div>
-        <div className="mb-3">
-          <label className="form-label">Alt Text</label>
-          <input
-            type="text"
-            className="form-control"
-            name="mediaAlt"
-            value={formData.mediaAlt}
-            onChange={handleChange}
-            placeholder="Enter alt text"
-          />
-        </div>
+        {formData.media.map((media, index) => (
+          <div key={index} className="mb-3">
+            <label className="form-label">Image URL</label>
+            <input
+              type="text"
+              className="form-control"
+              name="url"
+              value={media.url}
+              onChange={(e) => handleChange(e, index)}
+              placeholder="Enter image URL"
+            />
+            <label className="form-label mt-2">Alt Text</label>
+            <input
+              type="text"
+              className="form-control"
+              name="alt"
+              value={media.alt}
+              onChange={(e) => handleChange(e, index)}
+              placeholder="Enter alt text"
+            />
+            {index > 0 && (
+              <button
+                type="button"
+                className="btn btn-danger mt-2"
+                onClick={() => removeMediaField(index)}
+              >
+                Remove
+              </button>
+            )}
+          </div>
+        ))}
+        {formData.media.length < 8 && (
+          <button
+            type="button"
+            className="btn btn-secondary mb-3"
+            onClick={addMediaField}
+          >
+            Add More Images
+          </button>
+        )}
 
         <button
           type="submit"

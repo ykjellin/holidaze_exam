@@ -25,6 +25,7 @@ const ProfileBookingsList: React.FC<BookingsListProps> = ({
   apiKey,
 }) => {
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [deleting, setDeleting] = useState<string | null>(null);
 
   useEffect(() => {
     if (!profile?.name) return;
@@ -49,7 +50,6 @@ const ProfileBookingsList: React.FC<BookingsListProps> = ({
         }
 
         const data = await response.json();
-
         setBookings(data.data || []);
       } catch (error) {
         console.error("❌ Failed to fetch bookings:", error);
@@ -58,6 +58,50 @@ const ProfileBookingsList: React.FC<BookingsListProps> = ({
 
     loadBookings();
   }, [profile, token, apiKey]);
+
+  const handleCancelBooking = async (bookingId: string) => {
+    if (!token || !apiKey) {
+      console.error("❌ Missing authentication credentials.");
+      return;
+    }
+
+    const confirmDelete = window.confirm(
+      "Are you sure you want to cancel this booking?"
+    );
+    if (!confirmDelete) return;
+
+    setDeleting(bookingId);
+
+    try {
+      const response = await fetch(
+        `https://v2.api.noroff.dev/holidaze/bookings/${bookingId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "X-Noroff-API-Key": apiKey,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to delete booking: ${response.status} ${response.statusText}`
+        );
+      }
+
+      setBookings((prevBookings) =>
+        prevBookings.filter((booking) => booking.id !== bookingId)
+      );
+
+      console.log(`✅ Booking ${bookingId} cancelled successfully.`);
+    } catch (error) {
+      console.error("❌ Failed to cancel booking:", error);
+      alert("Failed to cancel booking. Please try again.");
+    } finally {
+      setDeleting(null);
+    }
+  };
 
   return (
     <div className="mt-5">
@@ -89,6 +133,15 @@ const ProfileBookingsList: React.FC<BookingsListProps> = ({
                     <strong>Check-out:</strong>{" "}
                     {new Date(booking.dateTo).toLocaleDateString()}
                   </p>
+                  <button
+                    className="btn btn-danger w-100"
+                    onClick={() => handleCancelBooking(booking.id)}
+                    disabled={deleting === booking.id}
+                  >
+                    {deleting === booking.id
+                      ? "Cancelling..."
+                      : "Cancel Booking"}
+                  </button>
                 </div>
               </div>
             </div>

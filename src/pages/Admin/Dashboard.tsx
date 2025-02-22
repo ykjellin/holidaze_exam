@@ -42,6 +42,33 @@ const Dashboard = () => {
     loadVenues();
   }, [user, token, apiKey]);
 
+  const handleDeleteVenue = async (venueId: string) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this venue? This action cannot be undone."
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+      console.log(`🗑️ Deleting venue: ${venueId}`);
+
+      await fetchData(`/venues/${venueId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "X-Noroff-API-Key": apiKey ?? "",
+        },
+      });
+
+      console.log("✅ Venue deleted successfully");
+
+      window.location.reload();
+    } catch (err) {
+      console.error("❌ Failed to delete venue:", err);
+      alert("Failed to delete venue. Please try again.");
+    }
+  };
+
   return (
     <div className="container mt-5">
       <h1 className="text-center">Venue Management</h1>
@@ -53,7 +80,6 @@ const Dashboard = () => {
       </div>
 
       {error && <p className="alert alert-danger text-center">{error}</p>}
-
       {loading && <p className="text-center">Loading venues...</p>}
 
       {!loading && venues.length === 0 && (
@@ -81,7 +107,12 @@ const Dashboard = () => {
                   >
                     Bookings
                   </Link>
-                  <button className="btn btn-sm btn-danger">Delete</button>
+                  <button
+                    className="btn btn-sm btn-danger"
+                    onClick={() => handleDeleteVenue(venue.id)}
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
             </div>

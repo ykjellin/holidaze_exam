@@ -1,0 +1,160 @@
+@import "../base/variables";
+
+.home-container {
+  text-align: center;
+  padding: 4rem 0;
+
+  h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  p.lead {
+    font-size: 1.3rem;
+  }
+}
+
+.action-btn {
+  background-color: $primary !important;
+  color: $body-bg !important;
+  font-size: 1.5rem !important;
+}
+
+#venueCarousel {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  margin: 2rem auto;
+  overflow: hidden;
+}
+
+.carousel-inner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+}
+
+.venue-name-overlay {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: $primary;
+  color: $body-bg;
+  padding: 5px 10px;
+  border-radius: 1px;
+  font-size: 1.3rem;
+  text-align: center;
+  width: 100%;
+}
+
+.carousel-img {
+  width: 250px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 10px;
+  transition: all 0.4s ease-in-out;
+}
+
+.active-img {
+  width: 500px !important;
+  height: 350px !important;
+  border: 3px solid white;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  opacity: 1;
+}
+
+.inactive-img {
+  width: 250px !important;
+  height: 200px !important;
+  opacity: 0.6;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+  position: absolute;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  background: rgba(0, 0, 0, 0.6);
+  border: none;
+  padding: 10px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 40px;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+  border-radius: 0;
+  background: $primary !important;
+  max-width: 3rem;
+  opacity: 0.8 !important;
+}
+
+.carousel-control-prev {
+  left: 10px;
+}
+
+.carousel-control-next {
+  right: 10px;
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+  background-color: $primary !important;
+}
+
+@media (max-width: 768px) {
+  .home-container h1 {
+    font-size: 2rem;
+  }
+
+  .carousel-img {
+    width: 200px;
+    height: 150px;
+  }
+
+  .active-img {
+    width: 350px !important;
+    height: 250px !important;
+  }
+
+  .inactive-img {
+    width: 200px !important;
+    height: 150px !important;
+  }
+
+  .venue-name-overlay {
+    font-size: 1rem;
+  }
+
+  .carousel-control-prev,
+  .carousel-control-next {
+    font-size: 1.5rem;
+    width: 35px;
+    height: 35px;
+  }
+}
+
+button,
+.btn {
+  border-radius: 5px;
+  padding: 10px 15px;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
