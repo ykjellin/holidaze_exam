@@ -20,7 +20,6 @@ const Dashboard = () => {
       if (!user || !token || !apiKey) return;
 
       try {
-        console.log("🔹 Fetching venues for manager:", user.name);
         const response = await fetchData(`/profiles/${user.name}/venues`, {
           method: "GET",
           headers: {
@@ -29,7 +28,6 @@ const Dashboard = () => {
           },
         });
 
-        console.log("✅ Venues loaded:", response.data);
         setVenues(response.data || []);
       } catch (err) {
         console.error("❌ Failed to load venues:", err);

@@ -32,7 +32,6 @@ const ManageBookings = () => {
 
     const loadBookings = async () => {
       try {
-        console.log("🔹 Fetching bookings for venues managed by:", user.name);
         const response = await fetchData(
           `/profiles/${user.name}/venues?_bookings=true`,
           {
@@ -59,7 +58,6 @@ const ManageBookings = () => {
           }))
         );
 
-        console.log("✅ Bookings Loaded:", venueBookings);
         setBookings(venueBookings);
       } catch (err) {
         console.error("❌ Failed to fetch bookings:", err);

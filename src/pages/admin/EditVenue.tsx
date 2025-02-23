@@ -40,7 +40,6 @@ const EditVenue = () => {
       }
 
       try {
-        console.log(`🔹 Fetching Venue: ${id}`);
         const response = await fetchData(`/venues/${id}`, {
           method: "GET",
           headers: {
@@ -49,7 +48,6 @@ const EditVenue = () => {
           },
         });
 
-        console.log("✅ Venue Data Loaded:", response.data);
         const venue = response.data;
 
         setFormData({
@@ -152,7 +150,6 @@ const EditVenue = () => {
     };
 
     try {
-      console.log("🔹 Updating venue:", updatedVenue);
       const response = await fetchData(`/venues/${id}`, {
         method: "PUT",
         headers: {
@@ -273,7 +270,7 @@ const EditVenue = () => {
 
         <button
           type="submit"
-          className="btn btn-primary w-100"
+          className="btn w-100 custom-button"
           disabled={isSubmitting}
         >
           {isSubmitting ? "Updating..." : "Update Venue"}

@@ -175,51 +175,72 @@ const CreateVenue = () => {
         </div>
 
         <h4>Facilities</h4>
-        <div className="form-check">
+        {["wifi", "parking", "breakfast", "pets"].map((facility) => (
+          <div className="form-check" key={facility}>
+            <input
+              type="checkbox"
+              className="form-check-input"
+              name={facility}
+              checked={Boolean(formData[facility as keyof typeof formData])}
+              onChange={handleChange}
+            />
+            <label className="form-check-label">
+              {facility.charAt(0).toUpperCase() + facility.slice(1)}
+            </label>
+          </div>
+        ))}
+
+        <h4>Location</h4>
+        <div className="mb-3">
+          <label className="form-label">Address</label>
           <input
-            type="checkbox"
-            className="form-check-input"
-            name="wifi"
-            checked={formData.wifi}
+            type="text"
+            className="form-control"
+            name="address"
+            value={formData.address}
             onChange={handleChange}
+            placeholder="Enter street address"
           />
-          <label className="form-check-label">WiFi</label>
         </div>
-        <div className="form-check">
-          <input
-            type="checkbox"
-            className="form-check-input"
-            name="parking"
-            checked={formData.parking}
-            onChange={handleChange}
-          />
-          <label className="form-check-label">Parking</label>
+        <div className="row">
+          <div className="col-md-6 mb-3">
+            <label className="form-label">City</label>
+            <input
+              type="text"
+              className="form-control"
+              name="city"
+              value={formData.city}
+              onChange={handleChange}
+              placeholder="Enter city"
+            />
+          </div>
+          <div className="col-md-6 mb-3">
+            <label className="form-label">ZIP Code</label>
+            <input
+              type="text"
+              className="form-control"
+              name="zip"
+              value={formData.zip}
+              onChange={handleChange}
+              placeholder="Enter ZIP code"
+            />
+          </div>
         </div>
-        <div className="form-check">
+        <div className="mb-3">
+          <label className="form-label">Country</label>
           <input
-            type="checkbox"
-            className="form-check-input"
-            name="breakfast"
-            checked={formData.breakfast}
+            type="text"
+            className="form-control"
+            name="country"
+            value={formData.country}
             onChange={handleChange}
+            placeholder="Enter country"
           />
-          <label className="form-check-label">Breakfast</label>
-        </div>
-        <div className="form-check">
-          <input
-            type="checkbox"
-            className="form-check-input"
-            name="pets"
-            checked={formData.pets}
-            onChange={handleChange}
-          />
-          <label className="form-check-label">Pets Allowed</label>
         </div>
 
         <h4 className="mt-3">Media</h4>
         {formData.media.map((media, index) => (
           <div key={index} className="mb-3">
-            <label className="form-label">Image URL</label>
             <input
               type="text"
               className="form-control"
@@ -227,15 +248,6 @@ const CreateVenue = () => {
               value={media.url}
               onChange={(e) => handleChange(e, index)}
               placeholder="Enter image URL"
-            />
-            <label className="form-label mt-2">Alt Text</label>
-            <input
-              type="text"
-              className="form-control"
-              name="alt"
-              value={media.alt}
-              onChange={(e) => handleChange(e, index)}
-              placeholder="Enter alt text"
             />
             {index > 0 && (
               <button
@@ -248,19 +260,18 @@ const CreateVenue = () => {
             )}
           </div>
         ))}
-        {formData.media.length < 8 && (
-          <button
-            type="button"
-            className="btn btn-secondary mb-3"
-            onClick={addMediaField}
-          >
-            Add More Images
-          </button>
-        )}
+
+        <button
+          type="button"
+          className="btn btn-secondary mb-3"
+          onClick={addMediaField}
+        >
+          Add More Images
+        </button>
 
         <button
           type="submit"
-          className="btn btn-primary w-100"
+          className="btn w-100 custom-button"
           disabled={isSubmitting}
         >
           {isSubmitting ? "Creating..." : "Create Venue"}
