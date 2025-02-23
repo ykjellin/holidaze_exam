@@ -12,6 +12,18 @@ interface Venue {
   price?: number;
   maxGuests?: number;
   media: { url: string; alt: string }[];
+  meta?: {
+    wifi?: boolean;
+    parking?: boolean;
+    breakfast?: boolean;
+    pets?: boolean;
+  };
+  location?: {
+    address?: string;
+    city?: string;
+    zip?: string;
+    country?: string;
+  };
 }
 
 const VenueDetails = () => {
@@ -28,7 +40,9 @@ const VenueDetails = () => {
   useEffect(() => {
     const loadVenueDetails = async () => {
       try {
-        const response = await fetchData(`/venues/${id}?_media=true`);
+        const response = await fetchData(
+          `/venues/${id}?_media=true&_meta=true&_location=true`
+        );
 
         const venueData = response.data;
         if (!venueData.media || venueData.media.length === 0) {
@@ -103,6 +117,7 @@ const VenueDetails = () => {
     <div className="container mt-5 venue-container">
       {venue && (
         <div className="card mx-auto venue-details-card">
+          {/* Image Carousel */}
           <div className="image-carousel">
             <img
               src={
@@ -131,6 +146,7 @@ const VenueDetails = () => {
             )}
           </div>
 
+          {/* Venue Info */}
           <div className="card-body">
             <h1 className="text-center">{venue.name}</h1>
             <p className="text-center lead">
@@ -144,6 +160,33 @@ const VenueDetails = () => {
               <strong>Max Guests:</strong> {venue.maxGuests || "N/A"}
             </p>
 
+            {/* Venue Meta Information */}
+            <h5>Amenities</h5>
+            <ul>
+              <li>
+                WiFi: {venue.meta?.wifi ? "✅ Available" : "❌ Not Available"}
+              </li>
+              <li>
+                Parking:{" "}
+                {venue.meta?.parking ? "✅ Available" : "❌ Not Available"}
+              </li>
+              <li>
+                Breakfast:{" "}
+                {venue.meta?.breakfast ? "✅ Included" : "❌ Not Included"}
+              </li>
+              <li>Pets Allowed: {venue.meta?.pets ? "✅ Yes" : "❌ No"}</li>
+            </ul>
+
+            {/* Venue Location */}
+            <h5>Location</h5>
+            <p>
+              {venue.location?.address ? `${venue.location.address}, ` : ""}
+              {venue.location?.city ? `${venue.location.city}, ` : ""}
+              {venue.location?.zip ? `${venue.location.zip}, ` : ""}
+              {venue.location?.country || ""}
+            </p>
+
+            {/* Booking Form */}
             {token && apiKey ? (
               <form onSubmit={handleBooking} className="mt-4">
                 <h5>Book this Venue:</h5>
@@ -178,7 +221,7 @@ const VenueDetails = () => {
                   </div>
                 </div>
 
-                {/* Guests */}
+                {/* Guests Input Field */}
                 <div className="mb-3">
                   <label>Number of Guests:</label>
                   <input
@@ -186,12 +229,12 @@ const VenueDetails = () => {
                     className="form-control"
                     value={guests}
                     min="1"
-                    max={venue.maxGuests || 10}
+                    max={venue?.maxGuests || 10}
                     onChange={(e) => setGuests(Number(e.target.value))}
                   />
                 </div>
 
-                {/* Booking Messages */}
+                {/* Display Booking Messages */}
                 {bookingError && (
                   <p className="alert alert-danger">{bookingError}</p>
                 )}
@@ -199,7 +242,6 @@ const VenueDetails = () => {
                   <p className="alert alert-success">{bookingSuccess}</p>
                 )}
 
-                {/* Submit Button */}
                 <button type="submit" className="btn btn-primary w-100">
                   Book Now
                 </button>
