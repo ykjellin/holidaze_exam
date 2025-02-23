@@ -14,76 +14,71 @@ interface Venue {
 
 const Venues = () => {
   const [venues, setVenues] = useState<Venue[]>([]);
-  const [filteredVenues, setFilteredVenues] = useState<Venue[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOption, setSortOption] = useState("newest");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [isLastPage, setIsLastPage] = useState(false);
-  const [isFetching, setIsFetching] = useState(false);
 
   useEffect(() => {
-    const loadVenues = async () => {
-      if (isFetching || isLastPage) return;
-      setIsFetching(true);
+    loadVenues(1);
+  }, []);
 
-      try {
-        const response = await fetchData(
-          `/venues?page=${page}&limit=100&_bookings=true`
-        );
+  const loadVenues = async (newPage: number) => {
+    setLoading(true);
+    setError(null);
 
-        if (!response || !response.data) {
-          setError("Could not load venues. Please try again later.");
-          return;
-        }
-
-        setVenues((prevVenues) => {
-          const mergedVenues = [
-            ...prevVenues,
-            ...response.data.filter(
-              (venue: Venue) => !prevVenues.some((v) => v.id === venue.id)
-            ),
-          ];
-          return mergedVenues;
-        });
-
-        setIsLastPage(response.meta?.isLastPage ?? true);
-        if (!response.meta?.isLastPage) {
-          setPage((prevPage) => prevPage + 1);
-        }
-      } catch (err) {
-        setError("Could not load venues. Please try again later.");
-      } finally {
-        setIsFetching(false);
-        setLoading(false);
-      }
-    };
-
-    loadVenues();
-  }, [page]);
-
-  useEffect(() => {
-    if (!searchQuery) {
-      setFilteredVenues(venues);
-    }
-  }, [venues]);
-
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const query = e.target.value.toLowerCase();
-    setSearchQuery(query);
-
-    if (query === "") {
-      setFilteredVenues(venues);
-    } else {
-      const filtered = venues.filter((venue) =>
-        venue.name.toLowerCase().includes(query)
+    try {
+      const response = await fetchData(
+        `/venues?page=${newPage}&limit=100&_bookings=true`
       );
-      setFilteredVenues(filtered);
+
+      if (!response || !response.data) {
+        setError("Could not load venues. Please try again later.");
+        return;
+      }
+
+      setVenues(response.data);
+      setPage(newPage);
+      setIsLastPage(response.meta?.isLastPage ?? true);
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (err) {
+      setError("Could not load venues. Please try again later.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const sortedVenues = [...filteredVenues].sort((a, b) => {
+  const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+
+    if (query.trim() === "") {
+      loadVenues(1);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await fetchData(`/venues/search?q=${query}&limit=100`);
+
+      if (!response || !response.data) {
+        setError("Could not fetch search results. Please try again.");
+        return;
+      }
+
+      setVenues(response.data);
+      setIsLastPage(true);
+    } catch (err) {
+      setError("An error occurred while searching for venues.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const sortedVenues = [...venues].sort((a, b) => {
     switch (sortOption) {
       case "newest":
         return new Date(b.created).getTime() - new Date(a.created).getTime();
@@ -129,7 +124,7 @@ const Venues = () => {
       {!loading && !error && sortedVenues.length > 0 && (
         <div className="row">
           {sortedVenues.map((venue) => (
-            <div className="col-12 col-sm-6 col-md-4 mb-4" key={venue.id}>
+            <div className="col-12 col-md-6 col-lg-4 mb-4" key={venue.id}>
               <div className="card">
                 <img
                   src={
@@ -167,6 +162,26 @@ const Venues = () => {
 
       {!loading && !error && sortedVenues.length === 0 && (
         <p className="text-center">No venues match your search.</p>
+      )}
+
+      {!searchQuery && (
+        <div className="text-center mt-4">
+          <button
+            className="btn btn-venue-page me-2"
+            onClick={() => loadVenues(page - 1)}
+            disabled={page === 1}
+          >
+            Previous Page
+          </button>
+
+          <button
+            className="btn btn-venue-page"
+            onClick={() => loadVenues(page + 1)}
+            disabled={isLastPage}
+          >
+            Next Page
+          </button>
+        </div>
       )}
     </div>
   );
