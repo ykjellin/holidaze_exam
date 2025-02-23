@@ -4,6 +4,7 @@ import { fetchData } from "../api/api";
 import { useAuth } from "../hooks/useAuth";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import CustomCalendar from "../components/CustomCalendar"; // Import the new availability calendar
 
 interface Venue {
   id: string;
@@ -153,7 +154,7 @@ const VenueDetails = () => {
               {venue.description || "No description available."}
             </p>
             <p>
-              <strong>Price:</strong> $
+              <strong>Price:</strong> ${" "}
               {venue.price ? venue.price.toFixed(2) : "N/A"} per night
             </p>
             <p>
@@ -185,6 +186,9 @@ const VenueDetails = () => {
               {venue.location?.zip ? `${venue.location.zip}, ` : ""}
               {venue.location?.country || ""}
             </p>
+
+            {/* Availability Calendar */}
+            <CustomCalendar venueId={id!} />
 
             {/* Booking Form */}
             {token && apiKey ? (
