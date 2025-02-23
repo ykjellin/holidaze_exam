@@ -32,8 +32,6 @@ const ProfileVenueManager: React.FC<VenueManagerProps> = ({
       if (!response.ok) {
         throw new Error("Failed to register as venue manager.");
       }
-
-      console.log("✅ Successfully registered as Venue Manager");
     } catch (error) {
       console.error("❌ Failed to register as Venue Manager:", error);
     }

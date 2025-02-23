@@ -5,6 +5,11 @@
   font-weight: 600;
 }
 
+.custom-button {
+  background-color: $primary !important;
+  color: $body-bg !important;
+}
+
 button {
   @extend .btn-primary;
 }

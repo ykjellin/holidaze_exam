@@ -77,6 +77,63 @@
   margin: auto !important;
 }
 
+.custom-calendar {
+  border: 1px solid #ddd;
+  padding: 10px;
+  width: 300px;
+  text-align: center;
+  font-family: Arial, sans-serif;
+}
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+}
+.calendar-day {
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  border-radius: 5px;
+  text-align: center;
+  font-size: 14px;
+  position: relative;
+  cursor: pointer;
+}
+.booked {
+  background-color: #ccc;
+  color: #fff;
+  pointer-events: none;
+}
+.booked::after {
+  content: "✖";
+  color: red;
+  font-size: 24px;
+  font-weight: bold;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0.8;
+}
+.selected {
+  background-color: #90ee90 !important;
+}
+.check-in {
+  background-color: #008000 !important;
+}
+.check-out {
+  background-color: #0000ff !important;
+}
+.available {
+  background-color: #f0f0f0;
+}
+
 @media (max-width: 768px) {
   .image-carousel {
     max-width: 100%;

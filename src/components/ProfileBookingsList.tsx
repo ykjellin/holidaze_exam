@@ -93,8 +93,6 @@ const ProfileBookingsList: React.FC<BookingsListProps> = ({
       setBookings((prevBookings) =>
         prevBookings.filter((booking) => booking.id !== bookingId)
       );
-
-      console.log(`✅ Booking ${bookingId} cancelled successfully.`);
     } catch (error) {
       console.error("❌ Failed to cancel booking:", error);
       alert("Failed to cancel booking. Please try again.");

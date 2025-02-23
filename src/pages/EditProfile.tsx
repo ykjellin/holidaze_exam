@@ -20,8 +20,6 @@ const EditProfile = () => {
 
     setIsUpdating(true);
     try {
-      console.log("🔹 Updating Profile for:", user.name);
-
       const updates: { avatarUrl?: string; bio?: string } = {};
       if (newAvatar.trim()) {
         updates.avatarUrl = newAvatar.trim();
@@ -29,8 +27,6 @@ const EditProfile = () => {
       if (newBio.trim()) {
         updates.bio = newBio.trim();
       }
-
-      console.log("📌 Sending Updates:", updates);
 
       const updatedProfile = await updateProfile(
         token,

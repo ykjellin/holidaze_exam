@@ -2,9 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { fetchData } from "../api/api";
 import { useAuth } from "../hooks/useAuth";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import CustomCalendar from "../components/CustomCalendar"; // Import the new availability calendar
+import CustomCalendar from "../components/CustomCalendar"; // Updated to select dates
 
 interface Venue {
   id: string;
@@ -91,7 +89,7 @@ const VenueDetails = () => {
     }
 
     try {
-      const response = await fetchData(`/bookings`, {
+      await fetchData(`/bookings?_customer=true&_venue=true`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -107,7 +105,6 @@ const VenueDetails = () => {
       });
 
       setBookingSuccess("Booking successful! Your stay is confirmed.");
-      console.log("✅ Booking Created:", response);
     } catch (err) {
       setBookingError("❌ Booking failed. Please try again.");
       console.error("❌ Booking Error:", err);
@@ -118,7 +115,6 @@ const VenueDetails = () => {
     <div className="container mt-5 venue-container">
       {venue && (
         <div className="card mx-auto venue-details-card">
-          {/* Image Carousel */}
           <div className="image-carousel">
             <img
               src={
@@ -147,7 +143,6 @@ const VenueDetails = () => {
             )}
           </div>
 
-          {/* Venue Info */}
           <div className="card-body">
             <h1 className="text-center">{venue.name}</h1>
             <p className="text-center lead">
@@ -161,7 +156,6 @@ const VenueDetails = () => {
               <strong>Max Guests:</strong> {venue.maxGuests || "N/A"}
             </p>
 
-            {/* Venue Meta Information */}
             <h5>Amenities</h5>
             <ul>
               <li>
@@ -178,7 +172,6 @@ const VenueDetails = () => {
               <li>Pets Allowed: {venue.meta?.pets ? "✅ Yes" : "❌ No"}</li>
             </ul>
 
-            {/* Venue Location */}
             <h5>Location</h5>
             <p>
               {venue.location?.address ? `${venue.location.address}, ` : ""}
@@ -187,45 +180,18 @@ const VenueDetails = () => {
               {venue.location?.country || ""}
             </p>
 
-            {/* Availability Calendar */}
-            <CustomCalendar venueId={id!} />
+            <CustomCalendar
+              venueId={id!}
+              selectedDates={{ checkIn: checkInDate, checkOut: checkOutDate }}
+              onDateSelect={(checkIn, checkOut) => {
+                setCheckInDate(checkIn);
+                setCheckOutDate(checkOut);
+              }}
+            />
 
-            {/* Booking Form */}
             {token && apiKey ? (
               <form onSubmit={handleBooking} className="mt-4">
                 <h5>Book this Venue:</h5>
-
-                <div className="row">
-                  <div className="col-md-6 mb-3">
-                    <label>Check-in Date:</label>
-                    <DatePicker
-                      selected={checkInDate}
-                      onChange={(date) => setCheckInDate(date)}
-                      selectsStart
-                      startDate={checkInDate}
-                      endDate={checkOutDate}
-                      placeholderText="Select check-in date"
-                      className="form-control"
-                      minDate={new Date()}
-                    />
-                  </div>
-
-                  <div className="col-md-6 mb-3">
-                    <label>Check-out Date:</label>
-                    <DatePicker
-                      selected={checkOutDate}
-                      onChange={(date) => setCheckOutDate(date)}
-                      selectsEnd
-                      startDate={checkInDate}
-                      endDate={checkOutDate}
-                      placeholderText="Select check-out date"
-                      className="form-control"
-                      minDate={checkInDate || new Date()}
-                    />
-                  </div>
-                </div>
-
-                {/* Guests Input Field */}
                 <div className="mb-3">
                   <label>Number of Guests:</label>
                   <input
@@ -237,15 +203,12 @@ const VenueDetails = () => {
                     onChange={(e) => setGuests(Number(e.target.value))}
                   />
                 </div>
-
-                {/* Display Booking Messages */}
                 {bookingError && (
                   <p className="alert alert-danger">{bookingError}</p>
                 )}
                 {bookingSuccess && (
                   <p className="alert alert-success">{bookingSuccess}</p>
                 )}
-
                 <button type="submit" className="btn btn-primary w-100">
                   Book Now
                 </button>
@@ -255,7 +218,6 @@ const VenueDetails = () => {
                 You must <Link to="/login">log in</Link> to book this venue.
               </p>
             )}
-
             <Link to="/venues" className="btn btn-secondary mt-3">
               Back to Venues
             </Link>

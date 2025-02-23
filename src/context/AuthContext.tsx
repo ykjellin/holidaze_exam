@@ -40,10 +40,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     if (token && !apiKey) {
-      console.log("🔹 Fetching API Key...");
       fetchApiKey(token)
         .then((res) => {
-          console.log("✅ API Key Fetched:", res.key);
           setApiKey(res.key);
           setItem("apiKey", res.key);
         })
@@ -52,23 +50,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [token]);
 
   const login = async (email: string, password: string) => {
-    console.log("🔹 Attempting login...");
-
     try {
       const userData = await loginUser(email, password);
-      console.log("🔹 Login API Response:", userData);
 
-      console.log("🔹 Requesting API Key...");
       const apiKeyResponse = await fetchApiKey(userData.accessToken);
       if (!apiKeyResponse || !apiKeyResponse.key) {
         throw new Error("❌ Failed to fetch API key.");
       }
 
-      console.log("✅ API Key received:", apiKeyResponse.key);
       setApiKey(apiKeyResponse.key);
       setItem("apiKey", apiKeyResponse.key);
 
-      console.log("🔹 Fetching Full Profile for:", userData.name);
       const profileResponse = await fetchData(`/profiles/${userData.name}`, {
         method: "GET",
         headers: {
@@ -76,8 +68,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           "X-Noroff-API-Key": apiKeyResponse.key,
         },
       });
-
-      console.log("✅ Full Profile Data:", profileResponse.data);
 
       const formattedUser: User = {
         name: profileResponse.data.name,
@@ -90,8 +80,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         venueManager: profileResponse.data.venueManager ?? false,
       };
 
-      console.log("🔹 Storing Updated User Data:", formattedUser);
-
       setToken(userData.accessToken);
       setUser(formattedUser);
       setItem("token", userData.accessToken);
@@ -103,7 +91,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const logout = () => {
-    console.log("🔹 Logging out...");
     setUser(null);
     setToken(null);
     setApiKey(null);

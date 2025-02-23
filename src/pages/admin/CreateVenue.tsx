@@ -271,7 +271,7 @@ const CreateVenue = () => {
 
         <button
           type="submit"
-          className="btn btn-primary w-100"
+          className="btn w-100 custom-button"
           disabled={isSubmitting}
         >
           {isSubmitting ? "Creating..." : "Create Venue"}

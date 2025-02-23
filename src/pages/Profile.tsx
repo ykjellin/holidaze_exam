@@ -30,7 +30,6 @@ const Profile = () => {
 
     const loadProfile = async () => {
       try {
-        console.log("🔹 Fetching Profile for:", user.name);
         const response = await fetchData(`/profiles/${user.name}`, {
           method: "GET",
           headers: {

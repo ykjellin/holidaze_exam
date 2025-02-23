@@ -11,21 +11,22 @@ interface Booking {
 
 interface CustomCalendarProps {
   venueId: string;
+  onDateSelect: (checkIn: Date | null, checkOut: Date | null) => void;
+  selectedDates: { checkIn: Date | null; checkOut: Date | null };
 }
 
-const CustomCalendar = ({ venueId }: CustomCalendarProps) => {
+const CustomCalendar = ({
+  venueId,
+  onDateSelect,
+  selectedDates,
+}: CustomCalendarProps) => {
   const [unavailableDates, setUnavailableDates] = useState<Date[]>([]);
   const { token, apiKey } = useAuth();
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
   useEffect(() => {
     const fetchBookings = async () => {
-      if (!token || !apiKey) {
-        console.error("❌ Missing authentication credentials.");
-        return;
-      }
-
-      console.log("📌 Checking venueId in CustomCalendar:", venueId);
+      if (!token || !apiKey) return;
 
       try {
         const response = await fetchData(
@@ -40,26 +41,11 @@ const CustomCalendar = ({ venueId }: CustomCalendarProps) => {
           }
         );
 
-        console.log("📌 API Response:", response);
+        if (!response || !Array.isArray(response.data)) return;
 
-        if (!response || !Array.isArray(response.data)) {
-          console.error(
-            "❌ No bookings found or incorrect response structure."
-          );
-          return;
-        }
-
-        // ✅ Ensure bookings include venue
-        const validBookings = response.data.filter(
-          (booking: Booking) => booking.venue?.id
-        );
-
-        // ✅ Filter bookings for this specific venue
-        const venueBookings = validBookings.filter(
+        const venueBookings = response.data.filter(
           (booking: Booking) => booking.venue?.id === venueId
         );
-
-        console.log("✅ Filtered Bookings for Venue:", venueBookings);
 
         const bookedDates = venueBookings.flatMap((booking: Booking) => {
           if (!booking.dateFrom || !booking.dateTo) return [];
@@ -73,14 +59,13 @@ const CustomCalendar = ({ venueId }: CustomCalendarProps) => {
             d <= endDate;
             d.setDate(d.getDate() + 1)
           ) {
-            dates.push(new Date(d));
+            dates.push(new Date(d.getFullYear(), d.getMonth(), d.getDate()));
           }
 
           return dates;
         });
 
         setUnavailableDates(bookedDates);
-        console.log("✅ Final Unavailable Dates:", bookedDates);
       } catch (err) {
         console.error("❌ Fetch failed:", err);
       }
@@ -89,21 +74,18 @@ const CustomCalendar = ({ venueId }: CustomCalendarProps) => {
     if (venueId) fetchBookings();
   }, [venueId, token, apiKey]);
 
-  // Move to previous month
   const prevMonth = () => {
     setCurrentMonth(
       (prev) => new Date(prev.getFullYear(), prev.getMonth() - 1)
     );
   };
 
-  // Move to next month
   const nextMonth = () => {
     setCurrentMonth(
       (prev) => new Date(prev.getFullYear(), prev.getMonth() + 1)
     );
   };
 
-  // Generate a grid for the current month
   const generateCalendarDays = () => {
     const firstDay = new Date(
       currentMonth.getFullYear(),
@@ -124,10 +106,38 @@ const CustomCalendar = ({ venueId }: CustomCalendarProps) => {
     return daysArray;
   };
 
+  const isSelectedRange = (date: Date) => {
+    return (
+      selectedDates.checkIn &&
+      selectedDates.checkOut &&
+      date >= selectedDates.checkIn &&
+      date <= selectedDates.checkOut
+    );
+  };
+
+  const handleDateClick = (date: Date) => {
+    if (
+      unavailableDates.some(
+        (bookedDate) => bookedDate.toDateString() === date.toDateString()
+      )
+    )
+      return;
+
+    if (
+      !selectedDates.checkIn ||
+      (selectedDates.checkIn && selectedDates.checkOut)
+    ) {
+      onDateSelect(date, null);
+    } else if (date > selectedDates.checkIn) {
+      onDateSelect(selectedDates.checkIn, date);
+    } else {
+      onDateSelect(date, null);
+    }
+  };
+
   return (
     <div className="mt-4 custom-calendar">
       <h5>Venue Availability</h5>
-
       <div className="calendar-header">
         <button onClick={prevMonth}>❮</button>
         <span>
@@ -138,74 +148,32 @@ const CustomCalendar = ({ venueId }: CustomCalendarProps) => {
         </span>
         <button onClick={nextMonth}>❯</button>
       </div>
-
       <div className="calendar-grid">
         {generateCalendarDays().map((date, index) => {
           const isBooked = unavailableDates.some(
             (bookedDate) => bookedDate.toDateString() === date.toDateString()
           );
+          const isSelected = isSelectedRange(date);
+          const isCheckIn =
+            selectedDates.checkIn?.toDateString() === date.toDateString();
+          const isCheckOut =
+            selectedDates.checkOut?.toDateString() === date.toDateString();
 
           return (
             <div
               key={index}
-              className={`calendar-day ${isBooked ? "booked" : "available"}`}
+              className={`calendar-day ${isBooked ? "booked" : ""} ${
+                isSelected ? "selected" : "available"
+              } ${isCheckIn ? "check-in" : ""} ${
+                isCheckOut ? "check-out" : ""
+              }`}
+              onClick={() => handleDateClick(date)}
             >
               {date.getDate()}
             </div>
           );
         })}
       </div>
-
-      <style>
-        {`
-          .custom-calendar {
-            border: 1px solid #ddd;
-            padding: 10px;
-            width: 300px;
-            text-align: center;
-            font-family: Arial, sans-serif;
-          }
-          .calendar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-          }
-          .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 5px;
-          }
-          .calendar-day {
-            width: 40px;
-            height: 40px;
-            line-height: 40px;
-            border-radius: 5px;
-            text-align: center;
-            font-size: 14px;
-            position: relative;
-          }
-          .booked {
-            background-color: #ccc;
-            color: #fff;
-            pointer-events: none;
-          }
-          .booked::after {
-            content: "✖";
-            color: red;
-            font-size: 24px;
-            font-weight: bold;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            opacity: 0.8;
-          }
-          .available {
-            background-color: #f0f0f0;
-          }
-        `}
-      </style>
     </div>
   );
 };
