@@ -1,5 +1,9 @@
 # Holidaze 🏡✨
 
+![Image](https://github.com/user-attachments/assets/f987668b-b1b3-4861-af43-6a1968bd634d)
+
+---
+
 Holidaze is a **venue booking platform** where users can **browse, book, and manage venues**, while **venue managers** can list and manage their properties.
 
 ## 📌 Features
