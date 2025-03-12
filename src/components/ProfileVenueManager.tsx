@@ -1,3 +1,5 @@
+import { fetchData } from "../api/api";
+
 interface VenueManagerProps {
   profile: {
     name: string;
@@ -18,20 +20,20 @@ const ProfileVenueManager: React.FC<VenueManagerProps> = ({
   }
 
   const handleRegisterAsVenueManager = async () => {
-    try {
-      const response = await fetch(`/profiles/${profile.name}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-          "X-Noroff-API-Key": apiKey ?? "",
-        },
-        body: JSON.stringify({ venueManager: true }),
-      });
+    if (!token || !apiKey) {
+      return;
+    }
 
-      if (!response.ok) {
-        throw new Error("Failed to register as venue manager.");
-      }
+    try {
+      await fetchData(
+        `/profiles/${profile.name}`,
+        {
+          method: "PUT",
+          body: JSON.stringify({ venueManager: true }),
+        },
+        true,
+        true
+      );
     } catch (error) {
       console.error("❌ Failed to register as Venue Manager:", error);
     }
