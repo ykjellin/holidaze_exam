@@ -1,4 +1,6 @@
 import { fetchData } from "../api/api";
+import { useState } from "react";
+import { useAuth } from "../hooks/useAuth";
 
 interface VenueManagerProps {
   profile: {
@@ -15,39 +17,63 @@ const ProfileVenueManager: React.FC<VenueManagerProps> = ({
   token,
   apiKey,
 }) => {
-  if (!profile.email.endsWith("@stud.noroff.no") || profile.venueManager) {
+  const { updateUserProfile } = useAuth();
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  if (!profile.email.endsWith("@stud.noroff.no")) {
     return null;
   }
 
-  const handleRegisterAsVenueManager = async () => {
+  const toggleVenueManager = async () => {
     if (!token || !apiKey) {
       return;
     }
 
+    setIsUpdating(true);
+
     try {
-      await fetchData(
+      const newStatus = !profile.venueManager;
+
+      const updatedProfile = await fetchData(
         `/profiles/${profile.name}`,
         {
           method: "PUT",
-          body: JSON.stringify({ venueManager: true }),
+          body: JSON.stringify({ venueManager: newStatus }),
         },
         true,
         true
       );
+
+      console.log(
+        `✅ Venue Manager status updated to ${newStatus}`,
+        updatedProfile
+      );
+
+      updateUserProfile({ venueManager: newStatus });
     } catch (error) {
-      console.error("❌ Failed to register as Venue Manager:", error);
+      console.error("❌ Failed to update Venue Manager status:", error);
+    } finally {
+      setIsUpdating(false);
     }
   };
 
   return (
     <div className="mt-4 text-center">
-      <h2>Become a Venue Manager</h2>
-      <p>As a venue manager, you can create and manage your own venues.</p>
+      <h2>Venue Manager Status</h2>
+      <p>
+        You are currently{" "}
+        <strong>{profile.venueManager ? "a" : "not a"}</strong> venue manager.
+      </p>
       <button
-        className="btn btn-success"
-        onClick={handleRegisterAsVenueManager}
+        className={`btn ${profile.venueManager ? "btn-danger" : "btn-success"}`}
+        onClick={toggleVenueManager}
+        disabled={isUpdating}
       >
-        Register as Venue Manager
+        {isUpdating
+          ? "Updating..."
+          : profile.venueManager
+          ? "Revoke Venue Manager"
+          : "Become a Venue Manager"}
       </button>
     </div>
   );
