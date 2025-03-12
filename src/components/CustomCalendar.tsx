@@ -26,34 +26,39 @@ const CustomCalendar = ({
 
   useEffect(() => {
     const fetchBookings = async () => {
-      if (!token || !apiKey) return;
+      if (!token || !apiKey) {
+        console.warn("⚠️ Missing token or API key. Cannot fetch venue.");
+        return;
+      }
 
       try {
-        const response = await fetchData(
-          `/bookings?_customer=true&_venue=true`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "X-Noroff-API-Key": apiKey,
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        const response = await fetchData(`/venues/${venueId}?_bookings=true`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "X-Noroff-API-Key": apiKey,
+            "Content-Type": "application/json",
+          },
+        });
 
-        if (!response || !Array.isArray(response.data)) return;
+        if (!response || !response.data) {
+          console.warn("⚠️ No venue found or venue has no bookings.");
+          return;
+        }
 
-        const venueBookings = response.data.filter(
-          (booking: Booking) => booking.venue?.id === venueId
-        );
+        const venue = response.data;
+        const venueBookings = venue.bookings || [];
 
         const bookedDates = venueBookings.flatMap((booking: Booking) => {
-          if (!booking.dateFrom || !booking.dateTo) return [];
+          if (!booking.dateFrom || !booking.dateTo) {
+            console.warn("⚠️ Skipping booking due to missing dates:", booking);
+            return [];
+          }
 
           const startDate = new Date(booking.dateFrom);
           const endDate = new Date(booking.dateTo);
-          const dates: Date[] = [];
 
+          const dates: Date[] = [];
           for (
             let d = new Date(startDate);
             d <= endDate;

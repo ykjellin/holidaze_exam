@@ -34,7 +34,7 @@ const ProfileVenueManager: React.FC<VenueManagerProps> = ({
     try {
       const newStatus = !profile.venueManager;
 
-      const updatedProfile = await fetchData(
+      await fetchData(
         `/profiles/${profile.name}`,
         {
           method: "PUT",
@@ -42,11 +42,6 @@ const ProfileVenueManager: React.FC<VenueManagerProps> = ({
         },
         true,
         true
-      );
-
-      console.log(
-        `✅ Venue Manager status updated to ${newStatus}`,
-        updatedProfile
       );
 
       updateUserProfile({ venueManager: newStatus });
