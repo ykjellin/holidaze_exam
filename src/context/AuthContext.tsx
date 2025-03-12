@@ -17,6 +17,7 @@ interface AuthContextType {
   apiKey: string | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
+  updateUserProfile: (updatedData: Partial<User>) => void;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(
@@ -37,6 +38,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const [token, setToken] = useState<string | null>(getItem("token"));
   const [apiKey, setApiKey] = useState<string | null>(getItem("apiKey"));
+
+  const updateUserProfile = (updatedData: Partial<User>) => {
+    setUser((prevUser) => {
+      if (!prevUser) return null;
+
+      const updatedUser: User = { ...prevUser, ...updatedData };
+
+      localStorage.setItem("profile", JSON.stringify(updatedUser));
+
+      return updatedUser;
+    });
+  };
 
   useEffect(() => {
     if (token && !apiKey) {
@@ -100,7 +113,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, apiKey, login, logout }}>
+    <AuthContext.Provider
+      value={{ user, token, apiKey, login, logout, updateUserProfile }}
+    >
       {children}
     </AuthContext.Provider>
   );

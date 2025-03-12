@@ -7,8 +7,11 @@ export async function fetchData(
   useHolidaze = true,
   requiresAuth = false
 ) {
-  const token = localStorage.getItem("token");
-  const apiKey = localStorage.getItem("apiKey");
+  let token = localStorage.getItem("token");
+  let apiKey = localStorage.getItem("apiKey");
+
+  token = token ? token.replace(/^"(.*)"$/, "$1") : null;
+  apiKey = apiKey ? apiKey.replace(/^"(.*)"$/, "$1") : null;
 
   if (requiresAuth && (!token || !apiKey)) {
     throw new Error("Missing authentication credentials");
@@ -21,6 +24,13 @@ export async function fetchData(
   if (requiresAuth) {
     headers.append("X-Noroff-API-Key", apiKey as string);
     headers.append("Authorization", `Bearer ${token}`);
+  }
+
+  if (options.headers) {
+    const existingHeaders = new Headers(options.headers);
+    existingHeaders.forEach((value, key) => {
+      headers.set(key, value);
+    });
   }
 
   const url = `${BASE_URL}${useHolidaze ? HOLIDAZE_PATH : ""}${endpoint}`;
